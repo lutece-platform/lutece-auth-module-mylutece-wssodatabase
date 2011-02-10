@@ -1,0 +1,54 @@
+<div class="content-box" >
+    
+    <h2>#i18n{module.mylutece.wssodatabase.create_user.tableTitle}</h2>
+    
+    <form name="search_user" action="jsp/admin/plugins/mylutece/modules/wssodatabase/CreateUser.jsp">
+        <p>
+            <label for="last_name">#i18n{module.mylutece.wssodatabase.create_user.lastName} : </label>
+            <input type="text" name="last_name" size="35" tabindex="1" maxlength="50" value="${last_name}" />
+        </p>
+        
+        <p>
+            <label for="first_name">#i18n{module.mylutece.wssodatabase.create_user.firstName} : </label>
+            <input type="text"  name="first_name" maxlength="50" size="35" tabindex="2" value="${first_name}" />
+        </p>
+        
+        <p>
+            <label for="email">#i18n{module.mylutece.wssodatabase.create_user.eMail} : </label>
+            <input type="text"  name="email" maxlength="50" size="35" tabindex="3" value="${email}" />
+        </p>
+        
+        <p>
+            <input type="hidden" name="plugin_name" value="${plugin_name}" />
+            <input type="submit" class="button" value="#i18n{module.mylutece.wssodatabase.create_user.btnSearch}" tabindex="4" />
+        </p>
+    </form>
+    
+    <#if user_list?has_content>
+    <table>
+        <tr>
+            <th class="admin-title" height="30" colspan="4">#i18n{module.mylutece.wssodatabase.create_user.result}</th>
+        </tr>
+        <tr>
+            <th align="center" width="30%" height="20">#i18n{module.mylutece.wssodatabase.create_user.colLastName}</th>
+            <th align="center" width="30%" height="20">#i18n{module.mylutece.wssodatabase.create_user.colFirstName}</th>
+            <th align="center" width="30%" height="20">#i18n{module.mylutece.wssodatabase.create_user.colEmail}</th>
+            <th align="center" width="10%" height="20"></th>					
+        </tr>
+        <#list user_list as user >
+        <tr>
+            <form action ="jsp/admin/plugins/mylutece/modules/wssodatabase/DoModifyOrderUser.jsp">
+                <input type="hidden" name="plugin_name" value="${plugin_name}" />
+                <td width="30%">${user.lastName}</td>
+                <td width="30%">&nbsp;${user.firstName}</td>
+                <td width="30%">&nbsp;${user.email}</td>
+                <td valign="middle" align="center" width="10%">
+                    <a href="jsp/admin/plugins/mylutece/modules/wssodatabase/DoCreateUser.jsp?plugin_name=${plugin_name}&guid=${user.guid}">#i18n{module.mylutece.wssodatabase.create_user.linkImport}</a>
+                </td>
+            </form>
+        </tr>
+        </#list>
+    </table>
+    </#if>
+    
+</div>

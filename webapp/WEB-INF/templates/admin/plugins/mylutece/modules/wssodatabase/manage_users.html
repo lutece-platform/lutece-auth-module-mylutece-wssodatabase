@@ -1,0 +1,40 @@
+<div class="content-box" >
+    
+    <h2>#i18n{module.mylutece.wssodatabase.manage_users.tableTitle}</h2>
+    
+    <table>
+        <tr>
+            <th width="25%">#i18n{module.mylutece.wssodatabase.manage_users.colLastName}</th>
+            <th width="25%">#i18n{module.mylutece.wssodatabase.manage_users.colFirstName}</th>
+            <th width="25%">#i18n{module.mylutece.wssodatabase.manage_users.colEmail}</th>
+            <th width="15%"></th>					
+            <th width="10%"></th>
+        </tr>
+        <#list user_list as user >
+        <tr>
+            <td width="25%">${user.lastName}</td>
+            <td width="25%">&nbsp;${user.firstName}</td>
+            <td width="25%">&nbsp;${user.email}</td>
+            <td valign="middle" align="center" width="15%">
+                <form action="jsp/admin/plugins/mylutece/modules/wssodatabase/ManageRolesUser.jsp">
+                    <input type="hidden" name="plugin_name" value="${plugin_name}" />
+                    <input type="hidden" name="mylutece_wsso_user_id" value="${user.myluteceWssoUserId}" />
+                    <input type="submit" class="button" value="#i18n{module.mylutece.wssodatabase.manage_users.linkManageRoles}" />
+                </form>
+            </td>
+            <td  valign="middle" align="center" width="10%">
+                <a href="jsp/admin/plugins/mylutece/modules/wssodatabase/RemoveUser.jsp?plugin_name=${plugin_name}&mylutece_wsso_user_id=${user.myluteceWssoUserId}">
+                    <img src="images/admin/skin/actions/delete.png" border="0" />
+                </a>
+            </td>
+        </tr>
+        </#list>
+    </table>
+    
+    <p>
+        <form action="jsp/admin/plugins/mylutece/modules/wssodatabase/CreateUser.jsp">
+            <input type="hidden" name="plugin_name" value="${plugin_name}" />
+            <input type="submit" class="button" value="#i18n{module.mylutece.wssodatabase.manage_users.btnCreateUser}" />
+        </form>
+    </p>
+</div>

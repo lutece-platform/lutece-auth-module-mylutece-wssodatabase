@@ -1,0 +1,38 @@
+<div class="content-box" >
+    <h2>#i18n{module.mylutece.wssodatabase.manage_roles_user.tableTitle}</h2>
+    
+    <form action="jsp/admin/plugins/mylutece/modules/wssodatabase/DoAssignRoleUser.jsp">
+        <input type="hidden" name="mylutece_wsso_user_id" value="${user.myluteceWssoUserId}" />
+        <table>
+            <tr>
+                <th width="20%">#i18n{module.mylutece.wssodatabase.manage_roles_user.colName}</th>
+                <th width="70%">#i18n{module.mylutece.wssodatabase.manage_roles_user.colLabel}</th>
+                <th width="10%"></th>
+            </tr>
+            <#list role_list as role >
+			<#if role.role != "none">
+            <tr>
+                <td>${role.role}</td>
+                <td>&nbsp;${role.roleDescription}</td>
+                <td valign="middle" align="center">
+                    <#assign checkedString = '' > 
+                    <#list user_role_list as user_role >
+                        <#if user_role = role.role >
+                        <#assign checkedString >
+                            checked="checked"
+                        </#assign>
+                        <#break>
+                        </#if>
+                    </#list>
+                    <input type="checkbox" class="checkbox" name="mylutece_wsso_role_id" value="${role.role}" ${checkedString} />
+                </td>
+            </tr>
+            </#if>
+            </#list>
+        </table>
+        <p>
+            <input type="hidden" name="plugin_name" value="${plugin_name}" />
+            <input type="submit" class="button" value="#i18n{module.mylutece.wssodatabase.manage_roles_user.btnAssign}" />
+        </p>
+    </form>
+</div>

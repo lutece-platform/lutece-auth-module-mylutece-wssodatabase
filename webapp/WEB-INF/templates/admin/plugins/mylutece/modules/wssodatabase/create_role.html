@@ -1,0 +1,20 @@
+<div class="content-box" >
+    
+    <h2>#i18n{module.mylutece.wssodatabase.create_role.tableTitle}</h2>
+    
+    <form enctype="multipart/form-data" action="jsp/admin/plugins/mylutece/modules/wssodatabase/DoCreateRole.jsp" method="get">
+        <p>
+        <label for="role_key">#i18n{module.mylutece.wssodatabase.create_role.name} * : </label>
+        <input type="text" name="role_key" size="35" maxlength="50" tabindex="1" />
+        </p>
+        <p>
+            <label for="role_label">#i18n{module.mylutece.wssodatabase.create_role.label} : </label>
+            <input type="text" name="role_label" size="35" maxlength="150" tabindex="2" />
+        </p>
+        <p>
+            <input type="hidden" name="plugin_name" value="${plugin_name}" />
+            <input type="submit" class="button" value="#i18n{module.mylutece.wssodatabase.create_role.btnValidate}" tabindex="3" />
+        </p>
+    </form>
+    
+</div>

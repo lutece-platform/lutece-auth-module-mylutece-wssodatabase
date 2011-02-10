@@ -1,0 +1,34 @@
+<div class="content-box" >
+    
+    <h2>#i18n{module.mylutece.wssodatabase.manage_roles.tableTitle}</h2>
+    
+    <table>
+        <tr>
+            <th width="20%">#i18n{module.mylutece.wssodatabase.manage_roles.name}</th>
+            <th width="70%">#i18n{module.mylutece.wssodatabase.manage_roles.label}</th>
+            <th width="10%"></th>
+        </tr>
+        <#list role_list as role >
+        <tr>
+            <form action ="jsp/admin/plugins/mylutece/modules/wssodatabase/DoModifyOrderRole.jsp">
+                <input type="hidden" name="plugin_name" value="${plugin_name}" />
+                <td width="20%">
+                    <a href="jsp/admin/plugins/mylutece/modules/wssodatabase/ModifyRole.jsp?plugin_name=${plugin_name}&mylutece_wsso_role_id=${role.myluteceWssoRoleId}" class="bullet-link">${role.roleKey}
+                </td>
+                <td width="70%">&nbsp;${role.roleLabel}</td>
+                <td valign="middle" align="center" width="10%">
+                    <a href="jsp/admin/plugins/mylutece/modules/wssodatabase/RemoveRole.jsp?plugin_name=${plugin_name}&mylutece_wsso_role_id=${role.myluteceWssoRoleId}">
+                        <img src="images/admin/skin/actions/delete.png" border="0" />
+                    </a>
+                </td>
+            </form>
+        </tr>
+        </#list>
+    </table>
+    <p>
+        <form action="jsp/admin/plugins/mylutece/modules/wssodatabase/CreateRole.jsp">
+            <input type="hidden" name="plugin_name" value="${plugin_name}" />
+            <input type="submit" class="button" value="#i18n{module.mylutece.wssodatabase.manage_roles.btnCreateRole}" />
+        </form>
+    </p>
+</div>

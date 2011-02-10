@@ -1,0 +1,18 @@
+<div class="content-box" >
+    <h2>#i18n{module.mylutece.wssodatabase.modify_role.tableTitle}</h2>
+    
+    <form enctype="multipart/form-data"  action="jsp/admin/plugins/mylutece/modules/wssodatabase/DoModifyRole.jsp" method="get" >
+        <input type="hidden" name="plugin_name" value="${plugin_name}" />
+        <input type="hidden" name="mylutece_wsso_role_id" value="${mylutece_wsso_role_id}" />
+        <p>
+            <label for="role_key">#i18n{module.mylutece.wssodatabase.modify_role.name} * : </label>
+            <input type="text" name="role_key" size="35" maxlength="50" value="${role_key}" tabindex="1" />
+        </p>
+        <p>
+            <label for="role_label">#i18n{module.mylutece.wssodatabase.modify_role.label} : </label>
+            <input type="text" name="role_label" size="35" maxlength="150" value="${role_label}" tabindex="2" />
+        <p>        
+            <input type="submit" class="button" value="#i18n{module.mylutece.wssodatabase.modify_role.btnModify}" tabindex="3" />
+        </p>
+    </form>
+</div>
