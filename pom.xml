@@ -39,6 +39,6 @@
     <scm>
         <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/authentication/module-mylutece-wssodatabase</connection>
         <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/authentication/module-mylutece-wssodatabase</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/portal/trunk/plugins/authentication/module-mylutece-wssodatabase</url>
+        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/trunk/plugins/authentication/module-mylutece-wssodatabase</url>
     </scm>
 </project>
