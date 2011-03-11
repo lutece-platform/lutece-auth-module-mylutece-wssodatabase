@@ -10,7 +10,7 @@
 	<groupId>fr.paris.lutece.plugins</groupId>
 	<artifactId>module-mylutece-wssodatabase</artifactId>
 	<packaging>lutece-plugin</packaging>
-	<version>2.2.1</version>
+	<version>2.2.2-SNAPSHOT</version>
 	<name>Lutece mylutece wssodatabase module</name>
 
 	<repositories>
@@ -37,8 +37,8 @@
 		<jiraComponentId>10071</jiraComponentId>
 	</properties>
     <scm>
-        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/tags/module-mylutece-wssodatabase-2.2.1</connection>
-        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/tags/module-mylutece-wssodatabase-2.2.1</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/tags/module-mylutece-wssodatabase-2.2.1</url>
+        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/authentication/module-mylutece-wssodatabase</connection>
+        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/authentication/module-mylutece-wssodatabase</developerConnection>
+        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/trunk/plugins/authentication/module-mylutece-wssodatabase</url>
     </scm>
 </project>
