@@ -4,17 +4,19 @@
     
     <table>
         <tr>
-            <th width="25%">#i18n{module.mylutece.wssodatabase.manage_users.colLastName}</th>
-            <th width="25%">#i18n{module.mylutece.wssodatabase.manage_users.colFirstName}</th>
-            <th width="25%">#i18n{module.mylutece.wssodatabase.manage_users.colEmail}</th>
-            <th width="15%"></th>					
+            <th width="20%">#i18n{module.mylutece.wssodatabase.manage_users.colLastName}</th>
+            <th width="20%">#i18n{module.mylutece.wssodatabase.manage_users.colFirstName}</th>
+            <th width="20%">#i18n{module.mylutece.wssodatabase.manage_users.colEmail}</th>
+            <th width="15%">#i18n{module.mylutece.wssodatabase.manage_users.colDateLogin}</th>
+            <th width="15%"></th>
             <th width="10%"></th>
         </tr>
         <#list user_list as user >
         <tr>
-            <td width="25%">${user.lastName}</td>
-            <td width="25%">&nbsp;${user.firstName}</td>
-            <td width="25%">&nbsp;${user.email}</td>
+            <td width="20%">${user.lastName}</td>
+            <td width="20%">&nbsp;${user.firstName}</td>
+            <td width="20%">&nbsp;${user.email}</td>
+            <td width="15%">&nbsp;<#if user.dateLastLogin??>${user.dateLastLogin!}<#else>#i18n{module.mylutece.wssodatabase.manage_users.noDateLogin}</#if></td>
             <td valign="middle" align="center" width="15%">
                 <form action="jsp/admin/plugins/mylutece/modules/wssodatabase/ManageRolesUser.jsp">
                     <input type="hidden" name="plugin_name" value="${plugin_name}" />

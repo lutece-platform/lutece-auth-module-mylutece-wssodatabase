@@ -8,6 +8,7 @@ CREATE TABLE mylutece_wsso_user (
 	last_name varchar(100) default '' NOT NULL,
 	first_name varchar(100) default '' NOT NULL,
 	email varchar(150) default '' NOT NULL,
+	date_last_login date NULL,
 	PRIMARY KEY (mylutece_wsso_user_id)
 );
 

@@ -35,130 +35,151 @@ package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.bus
 
 import fr.paris.lutece.portal.service.role.RoleRemovalListenerService;
 
+import java.util.Date;
+
 
 /**
  * This class represents the business object WssoUser
  */
 public class WssoUser
 {
-    // Variables declarations
-    private static WssoUserRoleRemovalListener _listenerRole;
-    private int _nMyluteceWssoUserId;
-    private String _strGuid;
-    private String _strLastName;
-    private String _strFirstName;
-    private String _strEmail;
+	// Variables declarations
+	private static WssoUserRoleRemovalListener _listenerRole;
+	private int _nMyluteceWssoUserId;
+	private String _strGuid;
+	private String _strLastName;
+	private String _strFirstName;
+	private String _strEmail;
+	private Date _dateLastLogin;
 
-    /**
-     * Initialize the LdapDatabaseUser
-     */
-    public static void init(  )
-    {
-        // Create removal listeners and register them
-        if ( _listenerRole == null )
-        {
-            _listenerRole = new WssoUserRoleRemovalListener(  );
-            RoleRemovalListenerService.getService(  ).registerListener( _listenerRole );
-        }
-    }
+	/**
+	 * Initialize the LdapDatabaseUser
+	 */
+	public static void init( )
+	{
+		// Create removal listeners and register them
+		if ( _listenerRole == null )
+		{
+			_listenerRole = new WssoUserRoleRemovalListener( );
+			RoleRemovalListenerService.getService( ).registerListener( _listenerRole );
+		}
+	}
 
-    /**
-     * Returns the MyluteceWssoUserId
-     *
-     * @return The MyluteceWssoUserId
-     */
-    public int getMyluteceWssoUserId(  )
-    {
-        return _nMyluteceWssoUserId;
-    }
+	/**
+	 * Returns the MyluteceWssoUserId
+	 * 
+	 * @return The MyluteceWssoUserId
+	 */
+	public int getMyluteceWssoUserId( )
+	{
+		return _nMyluteceWssoUserId;
+	}
 
-    /**
-     * Sets the MyluteceWssoUserId
-     *
-     * @param nMyluteceWssoUserId The MyluteceWssoUserId
-     */
-    public void setMyluteceWssoUserId( int nMyluteceWssoUserId )
-    {
-        _nMyluteceWssoUserId = nMyluteceWssoUserId;
-    }
+	/**
+	 * Sets the MyluteceWssoUserId
+	 * 
+	 * @param nMyluteceWssoUserId The MyluteceWssoUserId
+	 */
+	public void setMyluteceWssoUserId( int nMyluteceWssoUserId )
+	{
+		_nMyluteceWssoUserId = nMyluteceWssoUserId;
+	}
 
-    /**
-     * Returns the Guid
-     *
-     * @return The Guid
-     */
-    public String getGuid(  )
-    {
-        return _strGuid;
-    }
+	/**
+	 * Returns the Guid
+	 * 
+	 * @return The Guid
+	 */
+	public String getGuid( )
+	{
+		return _strGuid;
+	}
 
-    /**
-     * Sets the Guid
-     *
-     * @param strGuid The Guid
-     */
-    public void setGuid( String strGuid )
-    {
-        _strGuid = strGuid;
-    }
+	/**
+	 * Sets the Guid
+	 * 
+	 * @param strGuid The Guid
+	 */
+	public void setGuid( String strGuid )
+	{
+		_strGuid = strGuid;
+	}
 
-    /**
-     * Returns the LastName
-     *
-     * @return The LastName
-     */
-    public String getLastName(  )
-    {
-        return _strLastName;
-    }
+	/**
+	 * Returns the LastName
+	 * 
+	 * @return The LastName
+	 */
+	public String getLastName( )
+	{
+		return _strLastName;
+	}
 
-    /**
-     * Sets the LastName
-     *
-     * @param strLastName The LastName
-     */
-    public void setLastName( String strLastName )
-    {
-        _strLastName = strLastName;
-    }
+	/**
+	 * Sets the LastName
+	 * 
+	 * @param strLastName The LastName
+	 */
+	public void setLastName( String strLastName )
+	{
+		_strLastName = strLastName;
+	}
 
-    /**
-     * Returns the FirstName
-     *
-     * @return The FirstName
-     */
-    public String getFirstName(  )
-    {
-        return _strFirstName;
-    }
+	/**
+	 * Returns the FirstName
+	 * 
+	 * @return The FirstName
+	 */
+	public String getFirstName( )
+	{
+		return _strFirstName;
+	}
 
-    /**
-     * Sets the FirstName
-     *
-     * @param strFirstName The FirstName
-     */
-    public void setFirstName( String strFirstName )
-    {
-        _strFirstName = strFirstName;
-    }
+	/**
+	 * Sets the FirstName
+	 * 
+	 * @param strFirstName The FirstName
+	 */
+	public void setFirstName( String strFirstName )
+	{
+		_strFirstName = strFirstName;
+	}
 
-    /**
-     * Returns the Email
-     *
-     * @return The Email
-     */
-    public String getEmail(  )
-    {
-        return _strEmail;
-    }
+	/**
+	 * Returns the Email
+	 * 
+	 * @return The Email
+	 */
+	public String getEmail( )
+	{
+		return _strEmail;
+	}
 
-    /**
-     * Sets the Email
-     *
-     * @param strEmail The Email
-     */
-    public void setEmail( String strEmail )
-    {
-        _strEmail = strEmail;
-    }
+	/**
+	 * Sets the Email
+	 * 
+	 * @param strEmail The Email
+	 */
+	public void setEmail( String strEmail )
+	{
+		_strEmail = strEmail;
+	}
+
+	/**
+	 * Get the date of last login of the user
+	 * @return The date of last login
+	 */
+	public Date getDateLastLogin( )
+	{
+		return _dateLastLogin;
+	}
+
+	/**
+	 * Set the date of last login of the user
+	 * @param dateLastLogin The new date of last login
+	 */
+	public void setDateLastLogin( Date dateLastLogin )
+	{
+		_dateLastLogin = dateLastLogin;
+	}
 }

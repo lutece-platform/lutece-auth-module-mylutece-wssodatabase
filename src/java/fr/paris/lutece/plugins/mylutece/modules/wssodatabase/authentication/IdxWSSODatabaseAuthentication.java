@@ -46,227 +46,229 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * The Class provides an implementation of the PortalService interface based on
- * a the IdealX WebSSO solution. It retrieves roles associated with the user from the database.
+ * The Class provides an implementation of the PortalService interface based on a the IdealX WebSSO solution. It retrieves roles associated with the user from the database.
  */
 public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
 {
-    private static final String PROPERTY_AUTH_SERVICE_NAME = "mylutece-wssodatabase.service.name";
-    private static final String PROPERTY_COOKIE_AUTHENTIFICATION = "mylutece-wssodatabase.cookie.authenticationMode"; // authentication mode, login/pwd or certificate
-    private static final String PROPERTY_COOKIE_WSSOGUID = "mylutece-wssodatabase.cookie.wssoguid"; // unique hexa user id
-    private static final String PLUGIN_NAME = "mylutece-wssodatabase";
+	private static final String PROPERTY_AUTH_SERVICE_NAME = "mylutece-wssodatabase.service.name";
+	private static final String PROPERTY_COOKIE_AUTHENTIFICATION = "mylutece-wssodatabase.cookie.authenticationMode"; // authentication mode, login/pwd or certificate
+	private static final String PROPERTY_COOKIE_WSSOGUID = "mylutece-wssodatabase.cookie.wssoguid"; // unique hexa user id
+	private static final String PLUGIN_NAME = "mylutece-wssodatabase";
 
-    /**
-     * Constructor
-     */
-    public IdxWSSODatabaseAuthentication(  )
-    {
-    }
+	/**
+	 * Constructor
+	 */
+	public IdxWSSODatabaseAuthentication( )
+	{
+	}
 
-    /**
-     * Gets the Authentification service name
-     * @return The name of the authentication service
-     */
-    public String getAuthServiceName(  )
-    {
-        return AppPropertiesService.getProperty( PROPERTY_AUTH_SERVICE_NAME );
-    }
+	/**
+	 * Gets the Authentification service name
+	 * @return The name of the authentication service
+	 */
+	public String getAuthServiceName( )
+	{
+		return AppPropertiesService.getProperty( PROPERTY_AUTH_SERVICE_NAME );
+	}
 
-    /**
-     * Gets the Authentification type
-     * @param request The HTTP request
-     * @return The type of authentication
-     */
-    public String getAuthType( HttpServletRequest request )
-    {
-        Cookie[] cookies = request.getCookies(  );
-        String strAuthType = request.getAuthType(  );
+	/**
+	 * Gets the Authentification type
+	 * @param request The HTTP request
+	 * @return The type of authentication
+	 */
+	public String getAuthType( HttpServletRequest request )
+	{
+		Cookie[] cookies = request.getCookies( );
+		String strAuthType = request.getAuthType( );
 
-        for ( int i = 0; i < cookies.length; i++ )
-        {
-            Cookie cookie = cookies[i];
+		for ( int i = 0; i < cookies.length; i++ )
+		{
+			Cookie cookie = cookies[i];
 
-            if ( cookie.getName(  ).equals( PROPERTY_COOKIE_AUTHENTIFICATION ) )
-            {
-                strAuthType = cookie.getValue(  );
-            }
-        }
+			if ( cookie.getName( ).equals( PROPERTY_COOKIE_AUTHENTIFICATION ) )
+			{
+				strAuthType = cookie.getValue( );
+			}
+		}
 
-        return strAuthType;
-    }
+		return strAuthType;
+	}
 
-    /**
-     * This methods checks the login info in the base repository
-     *
-     * @param strUserName The username
-     * @param strUserPassword The password
-     * @param request The HTTP request
-     * @return A LuteceUser object corresponding to the login
-     * @throws LoginException The LoginException
-     */
-    public LuteceUser login( String strUserName, String strUserPassword, HttpServletRequest request )
-        throws LoginException
-    {
-        // There is no login required : the user is supposed to be already authenticated
-        return getHttpAuthenticatedUser( request );
-    }
+	/**
+	 * This methods checks the login info in the base repository
+	 * 
+	 * @param strUserName The username
+	 * @param strUserPassword The password
+	 * @param request The HTTP request
+	 * @return A LuteceUser object corresponding to the login
+	 * @throws LoginException The LoginException
+	 */
+	public LuteceUser login( String strUserName, String strUserPassword, HttpServletRequest request ) throws LoginException
+	{
+		// There is no login required : the user is supposed to be already authenticated
+		LuteceUser luteceUser = getHttpAuthenticatedUser( request );
 
-    /**
-     * This methods logout the user
-     * @param user The user
-     */
-    public void logout( LuteceUser user )
-    {
-    }
+		return luteceUser;
+	}
 
-    /**
-     * This method returns an anonymous Lutece user
-     *
-     * @return An anonymous Lutece user
-     */
-    public LuteceUser getAnonymousUser(  )
-    {
-        /**@todo Impl?menter cette m?thode fr.paris.lutece.portal.service.security.PortalAuthentication*/
-        throw new java.lang.UnsupportedOperationException( "The method getAnonymousUser() is not implemented yet." );
-    }
+	/**
+	 * This methods logout the user
+	 * @param user The user
+	 */
+	public void logout( LuteceUser user )
+	{
+	}
 
-    /**
-     * Checks that the current user is associated to a given role
-     * @param user The user
-     * @param request The HTTP request
-     * @param strRole The role name
-     * @return Returns true if the user is associated to the role, otherwise false
-     */
-    public boolean isUserInRole( LuteceUser user, HttpServletRequest request, String strRole )
-    {
-        if ( ( user == null ) || ( strRole == null ) )
-        {
-            return false;
-        }
+	/**
+	 * This method returns an anonymous Lutece user
+	 * 
+	 * @return An anonymous Lutece user
+	 */
+	public LuteceUser getAnonymousUser( )
+	{
+		/** @todo Implémenter cette méthode fr.paris.lutece.portal.service.security.PortalAuthentication */
+		throw new java.lang.UnsupportedOperationException( "The method getAnonymousUser() is not implemented yet." );
+	}
 
-        String[] roles = user.getRoles(  );
+	/**
+	 * Checks that the current user is associated to a given role
+	 * @param user The user
+	 * @param request The HTTP request
+	 * @param strRole The role name
+	 * @return Returns true if the user is associated to the role, otherwise false
+	 */
+	public boolean isUserInRole( LuteceUser user, HttpServletRequest request, String strRole )
+	{
+		if ( ( user == null ) || ( strRole == null ) )
+		{
+			return false;
+		}
 
-        if ( roles != null )
-        {
-            for ( int i = 0; i < roles.length; i++ )
-            {
-                if ( strRole.equals( roles[i] ) )
-                {
-                    return true;
-                }
-            }
-        }
+		String[] roles = user.getRoles( );
 
-        return false;
-    }
+		if ( roles != null )
+		{
+			for ( int i = 0; i < roles.length; i++ )
+			{
+				if ( strRole.equals( roles[i] ) )
+				{
+					return true;
+				}
+			}
+		}
 
-    /**
-     * Returns a Lutece user object if the user is already authenticated by the WSSO
-     * @param request The HTTP request
-     * @return Returns A Lutece User
-     */
-    public LuteceUser getHttpAuthenticatedUser( HttpServletRequest request )
-    {
-        Cookie[] cookies = request.getCookies(  );
-        IdxWSSODatabaseUser user = null;
-        String strUserID = null;
+		return false;
+	}
 
-        if ( cookies != null )
-        {
-            for ( int i = 0; i < cookies.length; i++ )
-            {
-                Cookie cookie = cookies[i];
+	/**
+	 * Returns a Lutece user object if the user is already authenticated by the WSSO
+	 * @param request The HTTP request
+	 * @return Returns A Lutece User
+	 */
+	public LuteceUser getHttpAuthenticatedUser( HttpServletRequest request )
+	{
+		Cookie[] cookies = request.getCookies( );
+		IdxWSSODatabaseUser user = null;
+		String strUserID = null;
 
-                if ( cookie.getName(  ).equals( AppPropertiesService.getProperty( PROPERTY_COOKIE_WSSOGUID ) ) )
-                {
-                    strUserID = cookie.getValue(  );
-                }
-            }
-        }
+		if ( cookies != null )
+		{
+			for ( int i = 0; i < cookies.length; i++ )
+			{
+				Cookie cookie = cookies[i];
 
-        if ( strUserID != null )
-        {
-            Plugin plugin = PluginService.getPlugin( PLUGIN_NAME );
-            user = IdxWSSODatabaseHome.findUserByGuid( strUserID, plugin, this );
+				if ( cookie.getName( ).equals( AppPropertiesService.getProperty( PROPERTY_COOKIE_WSSOGUID ) ) )
+				{
+					strUserID = cookie.getValue( );
+				}
+			}
+		}
 
-            List<String> arrayRoles = IdxWSSODatabaseHome.findUserRolesFromGuid( strUserID, plugin, this );
+		if ( strUserID != null )
+		{
+			
+			Plugin plugin = PluginService.getPlugin( PLUGIN_NAME );
+			user = IdxWSSODatabaseHome.findUserByGuid( strUserID, plugin, this );
 
-            if ( ( user != null ) && !arrayRoles.isEmpty(  ) )
-            {
-                user.setRoles( arrayRoles );
-            }
-        }
+			if ( user != null )
+			{
+				IdxWSSODatabaseHome.updateDateLastLogin( strUserID, new java.util.Date( ), plugin );
+				List<String> arrayRoles = IdxWSSODatabaseHome.findUserRolesFromGuid( strUserID, plugin, this );
 
-        return user;
-    }
+				if ( !arrayRoles.isEmpty( ) )
+				{
+					user.setRoles( arrayRoles );
+				}
+			}
+		}
 
-    /**
-     * Tells whether or not the authentication service can provide a list of all its users
-     * @return true if the service can return a users list
-     */
-    public boolean isUsersListAvailable(  )
-    {
-        return true;
-    }
+		return user;
+	}
 
-    /**
-     * Returns all users managed by the authentication service if this feature is
-     * available.
-     * @return A collection of Lutece users or null if the service doesn't provide a users list
-     */
-    public Collection<LuteceUser> getUsers(  )
-    {
-        Plugin plugin = PluginService.getPlugin( PLUGIN_NAME );
+	/**
+	 * Tells whether or not the authentication service can provide a list of all its users
+	 * @return true if the service can return a users list
+	 */
+	public boolean isUsersListAvailable( )
+	{
+		return true;
+	}
 
-        Collection<IdxWSSODatabaseUser> usersList = IdxWSSODatabaseHome.findUsersList( plugin, this );
-        Collection<LuteceUser> luteceUsers = new ArrayList<LuteceUser>(  );
+	/**
+	 * Returns all users managed by the authentication service if this feature is available.
+	 * @return A collection of Lutece users or null if the service doesn't provide a users list
+	 */
+	public Collection<LuteceUser> getUsers( )
+	{
+		Plugin plugin = PluginService.getPlugin( PLUGIN_NAME );
 
-        for ( IdxWSSODatabaseUser user : usersList )
-        {
-            luteceUsers.add( user );
-        }
+		Collection<IdxWSSODatabaseUser> usersList = IdxWSSODatabaseHome.findUsersList( plugin, this );
+		Collection<LuteceUser> luteceUsers = new ArrayList<LuteceUser>( );
 
-        return luteceUsers;
-    }
+		for ( IdxWSSODatabaseUser user : usersList )
+		{
+			luteceUsers.add( user );
+		}
 
-    /**
-     * Returns the user managed by the authentication service if this feature is
-     * available.
-     * @return A Lutece users or null if the service doesn't provide a user
-     */
-    public LuteceUser getUser( String userLogin )
-    {
-        Plugin plugin = PluginService.getPlugin( PLUGIN_NAME );
+		return luteceUsers;
+	}
 
-        //In case of wsso user, login is the guid
-        IdxWSSODatabaseUser user = IdxWSSODatabaseHome.findUserByGuid( userLogin, plugin, this );
+	/**
+	 * Returns the user managed by the authentication service if this feature is available.
+	 * @param userLogin user login
+	 * @return A Lutece users or null if the service doesn't provide a user
+	 */
+	public LuteceUser getUser( String userLogin )
+	{
+		Plugin plugin = PluginService.getPlugin( PLUGIN_NAME );
 
-        return user;
-    }
+		// In case of wsso user, login is the guid
+		IdxWSSODatabaseUser user = IdxWSSODatabaseHome.findUserByGuid( userLogin, plugin, this );
 
-    /**
-     * get all roles for this user :
-     *    - user's roles
-     *    - user's groups roles
-     *
-     * @param user The user
-     * @return Array of roles
-     */
-    public String[] getRolesByUser( LuteceUser user )
-    {
-        return user.getRoles(  );
-    }
-    /**
-     * 
-     *{@inheritDoc}
-     */
-	public String getIconUrl()
+		return user;
+	}
+
+	/**
+	 * get all roles for this user : - user's roles - user's groups roles
+	 * 
+	 * @param user The user
+	 * @return Array of roles
+	 */
+	public String[] getRolesByUser( LuteceUser user )
+	{
+		return user.getRoles( );
+	}
+
+	/**
+	 * 
+	 *{@inheritDoc}
+	 */
+	public String getIconUrl( )
 	{
 		return null;
 	}
@@ -275,7 +277,7 @@ public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
 	 * 
 	 *{@inheritDoc}
 	 */
-	public String getName()
+	public String getName( )
 	{
 		return WssoDatabasePlugin.PLUGIN_NAME;
 	}
@@ -284,7 +286,7 @@ public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
 	 * 
 	 *{@inheritDoc}
 	 */
-	public String getPluginName()
+	public String getPluginName( )
 	{
 		return WssoDatabasePlugin.PLUGIN_NAME;
 	}
@@ -293,7 +295,7 @@ public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
 	 * 
 	 *{@inheritDoc}
 	 */
-	public boolean isMultiAuthenticationSupported()
+	public boolean isMultiAuthenticationSupported( )
 	{
 		return false;
 	}

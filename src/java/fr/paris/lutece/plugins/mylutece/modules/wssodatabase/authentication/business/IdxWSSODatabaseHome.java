@@ -42,61 +42,71 @@ import java.util.Collection;
 import java.util.List;
 
 
+/**
+ * Home for IdxWSSODatabase
+ * 
+ */
 public final class IdxWSSODatabaseHome
 {
-    // Static variable pointed at the DAO instance
-    private static IIdxWSSODatabaseDAO _dao = (IdxWSSODatabaseDAO) SpringContextService.getPluginBean( "mylutece-wssodatabase",
-            "mylutece-wssodatabase.idxWSSODatabaseDAO" );
+	// Static variable pointed at the DAO instance
+	private static IIdxWSSODatabaseDAO _dao = ( IdxWSSODatabaseDAO ) SpringContextService.getPluginBean( "mylutece-wssodatabase", "mylutece-wssodatabase.idxWSSODatabaseDAO" );
 
-    /**
-     * Private constructor - this class need not be instantiated
-     */
-    private IdxWSSODatabaseHome(  )
-    {
-    }
+	/**
+	 * Private constructor - this class need not be instantiated
+	 */
+	private IdxWSSODatabaseHome( )
+	{
+	}
 
-    ///////////////////////////////////////////////////////////////////////////
-    // Finders
+	// /////////////////////////////////////////////////////////////////////////
+	// Finders
 
-    /**
-     * Find users by guid
-     *
-     * @param strGuid the WSSO guid
-     * @param plugin The Plugin using this data access service
-     * @param authenticationService the LuteceAuthentication object
-     * @return IdxWSSODatabaseUser the user corresponding to the guid
-     */
-    public static IdxWSSODatabaseUser findUserByGuid( String strGuid, Plugin plugin,
-        LuteceAuthentication authenticationService )
-    {
-        return _dao.findUserByGuid( strGuid, plugin, authenticationService );
-    }
+	/**
+	 * Find users by guid
+	 * 
+	 * @param strGuid the WSSO guid
+	 * @param plugin The Plugin using this data access service
+	 * @param authenticationService the LuteceAuthentication object
+	 * @return IdxWSSODatabaseUser the user corresponding to the guid
+	 */
+	public static IdxWSSODatabaseUser findUserByGuid( String strGuid, Plugin plugin, LuteceAuthentication authenticationService )
+	{
+		return _dao.findUserByGuid( strGuid, plugin, authenticationService );
+	}
 
-    /**
-     * Find user's roles by guid
-     *
-     * @param strGuid the WSSO guid
-     * @param plugin The Plugin using this data access service
-     * @param authenticationService the LuteceAuthentication object
-     * @return ArrayList the roles list corresponding to the guid
-     */
-    public static List<String> findUserRolesFromGuid( String strGuid, Plugin plugin,
-        LuteceAuthentication authenticationService )
-    {
-        return _dao.findUserRolesFromGuid( strGuid, plugin, authenticationService );
-    }
+	/**
+	 * Find user's roles by guid
+	 * 
+	 * @param strGuid the WSSO guid
+	 * @param plugin The Plugin using this data access service
+	 * @param authenticationService the LuteceAuthentication object
+	 * @return ArrayList the roles list corresponding to the guid
+	 */
+	public static List<String> findUserRolesFromGuid( String strGuid, Plugin plugin, LuteceAuthentication authenticationService )
+	{
+		return _dao.findUserRolesFromGuid( strGuid, plugin, authenticationService );
+	}
 
-    /**
-     * Find users by guid
-     *
-     * @param strGuid the WSSO guid
-     * @param plugin The Plugin using this data access service
-     * @param authenticationService the LuteceAuthentication object
-     * @return IdxWSSODatabaseUser the user corresponding to the guid
-     */
-    public static Collection<IdxWSSODatabaseUser> findUsersList( Plugin plugin,
-        LuteceAuthentication authenticationService )
-    {
-        return _dao.findUsersList( plugin, authenticationService );
-    }
+	/**
+	 * Update the last login date of a user
+	 * @param strGuid The GUID of the user to update
+	 * @param dateLastLogin New date of last connection
+	 * @param plugin The plugin
+	 */
+	public static void updateDateLastLogin( String strGuid, java.util.Date dateLastLogin, Plugin plugin )
+	{
+		_dao.updateDateLastLogin( strGuid, dateLastLogin, plugin );
+	}
+
+	/**
+	 * Find users by guid
+	 * 
+	 * @param plugin The Plugin using this data access service
+	 * @param authenticationService the LuteceAuthentication object
+	 * @return IdxWSSODatabaseUser the user corresponding to the guid
+	 */
+	public static Collection<IdxWSSODatabaseUser> findUsersList( Plugin plugin, LuteceAuthentication authenticationService )
+	{
+		return _dao.findUsersList( plugin, authenticationService );
+	}
 }
