@@ -7,7 +7,7 @@ CREATE TABLE mylutece_wsso_user (
 	guid varchar(40) default '0' NOT NULL,
 	last_name varchar(100) default '' NOT NULL,
 	first_name varchar(100) default '' NOT NULL,
-	email varchar(150) default '' NOT NULL,
+	email varchar(256) default '' NOT NULL,
 	date_last_login date NULL,
 	PRIMARY KEY (mylutece_wsso_user_id)
 );
