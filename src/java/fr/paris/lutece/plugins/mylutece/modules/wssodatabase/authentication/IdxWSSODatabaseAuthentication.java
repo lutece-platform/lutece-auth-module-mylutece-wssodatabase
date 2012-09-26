@@ -191,7 +191,7 @@ public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
 
 		if ( strUserID != null )
 		{
-			
+
 			Plugin plugin = PluginService.getPlugin( PLUGIN_NAME );
 			user = IdxWSSODatabaseHome.findUserByGuid( strUserID, plugin, this );
 
@@ -298,5 +298,16 @@ public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
 	public boolean isMultiAuthenticationSupported( )
 	{
 		return false;
+	}
+
+	/**
+	 * 
+	 *{@inheritDoc}
+	 */
+	@Override
+	public void updateDateLastLogin( LuteceUser user, HttpServletRequest request )
+	{
+		Plugin plugin = PluginService.getPlugin( PLUGIN_NAME );
+		IdxWSSODatabaseHome.updateDateLastLogin( user.getName( ), new java.util.Date( ), plugin );
 	}
 }
