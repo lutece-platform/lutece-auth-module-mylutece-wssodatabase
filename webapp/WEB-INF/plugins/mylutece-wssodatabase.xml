@@ -38,5 +38,15 @@
             <daemon-class>fr.paris.lutece.plugins.mylutece.modules.wssodatabase.service.daemon.ExportWssoUsersDaemon</daemon-class>
         </daemon>
     </daemons>
+   <!-- Filters -->
+ 	<filters>
+ 	 <!-- Filter Used for checking if the user logged in SSO session corresponding to the user stored in application session -->
+ 		<filter>
+			<filter-name>WSSO Session Tracking Filter</filter-name>
+			<filter-class>fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.security.WSSOSessionTrackingFilter</filter-class>
+			<url-pattern>/jsp/site/*</url-pattern>
+			<filter-order>33000</filter-order>
+		</filter>
+	</filters>
    
 </plug-in>
