@@ -36,9 +36,11 @@
         <jiraProjectName>WSSODATABASE</jiraProjectName>
         <jiraComponentId>10071</jiraComponentId>
     </properties>
+    
     <scm>
         <connection>scm:git:https://github.com/lutece-platform/lutece-auth-module-mylutece-wssodatabase.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-platform/lutece-auth-module-mylutece-wssodatabase.git</developerConnection>
         <url>https://github.com/lutece-platform/lutece-auth-module-mylutece-wssodatabase.git</url>
     </scm>
+    
 </project>

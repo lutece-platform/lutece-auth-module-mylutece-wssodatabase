@@ -44,99 +44,100 @@ import java.util.Collection;
  */
 public final class WssoUserHome
 {
-	// Static variable pointed at the DAO instance
-	private static IWssoUserDAO _dao = ( IWssoUserDAO ) SpringContextService.getPluginBean( "mylutece-wssodatabase", "mylutece-wssodatabase.wssoUserDAO" );
+    // Static variable pointed at the DAO instance
+    private static IWssoUserDAO _dao = (IWssoUserDAO) SpringContextService.getPluginBean( "mylutece-wssodatabase",
+            "mylutece-wssodatabase.wssoUserDAO" );
 
-	/**
-	 * Private constructor - this class need not be instantiated
-	 */
-	private WssoUserHome( )
-	{
-	}
+    /**
+     * Private constructor - this class need not be instantiated
+     */
+    private WssoUserHome(  )
+    {
+    }
 
-	/**
-	 * Creation of an instance of wssoUser
-	 * 
-	 * @param wssoUser The instance of the wssoUser which contains the informations to store
-	 * @param plugin The current plugin using this method
-	 * @return The instance of wssoUser which has been created with its primary key.
-	 */
-	public static WssoUser create( WssoUser wssoUser, Plugin plugin )
-	{
-		_dao.insert( wssoUser, plugin );
+    /**
+     * Creation of an instance of wssoUser
+     *
+     * @param wssoUser The instance of the wssoUser which contains the informations to store
+     * @param plugin The current plugin using this method
+     * @return The instance of wssoUser which has been created with its primary key.
+     */
+    public static WssoUser create( WssoUser wssoUser, Plugin plugin )
+    {
+        _dao.insert( wssoUser, plugin );
 
-		return wssoUser;
-	}
+        return wssoUser;
+    }
 
-	/**
-	 * Update of the wssoUser which is specified in parameter
-	 * 
-	 * @param wssoUser The instance of the wssoUser which contains the data to store
-	 * @param plugin The current plugin using this method
-	 * @return The instance of the wssoUser which has been updated
-	 */
-	public static WssoUser update( WssoUser wssoUser, Plugin plugin )
-	{
-		_dao.store( wssoUser, plugin );
+    /**
+     * Update of the wssoUser which is specified in parameter
+     *
+     * @param wssoUser The instance of the wssoUser which contains the data to store
+     * @param plugin The current plugin using this method
+     * @return The instance of the wssoUser which has been updated
+     */
+    public static WssoUser update( WssoUser wssoUser, Plugin plugin )
+    {
+        _dao.store( wssoUser, plugin );
 
-		return wssoUser;
-	}
+        return wssoUser;
+    }
 
-	/**
-	 * Remove the WssoUser whose identifier is specified in parameter
-	 * 
-	 * @param wssoUser The WssoUser object to remove
-	 * @param plugin The current plugin using this method
-	 */
-	public static void remove( WssoUser wssoUser, Plugin plugin )
-	{
-		_dao.delete( wssoUser, plugin );
-	}
+    /**
+     * Remove the WssoUser whose identifier is specified in parameter
+     *
+     * @param wssoUser The WssoUser object to remove
+     * @param plugin The current plugin using this method
+     */
+    public static void remove( WssoUser wssoUser, Plugin plugin )
+    {
+        _dao.delete( wssoUser, plugin );
+    }
 
-	// /////////////////////////////////////////////////////////////////////////
-	// Finders
+    // /////////////////////////////////////////////////////////////////////////
+    // Finders
 
-	/**
-	 * Returns an instance of a wssoUser whose identifier is specified in parameter
-	 * 
-	 * @param nKey The Primary key of the wssoUser
-	 * @param plugin The current plugin using this method
-	 * @return An instance of wssoUser
-	 */
-	public static WssoUser findByPrimaryKey( int nKey, Plugin plugin )
-	{
-		return _dao.load( nKey, plugin );
-	}
+    /**
+     * Returns an instance of a wssoUser whose identifier is specified in parameter
+     *
+     * @param nKey The Primary key of the wssoUser
+     * @param plugin The current plugin using this method
+     * @return An instance of wssoUser
+     */
+    public static WssoUser findByPrimaryKey( int nKey, Plugin plugin )
+    {
+        return _dao.load( nKey, plugin );
+    }
 
-	/**
-	 * Returns a collection of wssoUsers objects
-	 * @param plugin The current plugin using this method
-	 * @return A collection of wssoUsers
-	 */
-	public static Collection findWssoUsersList( Plugin plugin )
-	{
-		return _dao.selectWssoUserList( plugin );
-	}
+    /**
+     * Returns a collection of wssoUsers objects
+     * @param plugin The current plugin using this method
+     * @return A collection of wssoUsers
+     */
+    public static Collection findWssoUsersList( Plugin plugin )
+    {
+        return _dao.selectWssoUserList( plugin );
+    }
 
-	/**
-	 * Returns a collection of wssoUsers objects for a role
-	 * @param nIdRole The role id of the wssoUser
-	 * @param plugin The current plugin using this method
-	 * @return A collection of wssoUsers
-	 */
-	public static Collection findWssoUsersListForRole( int nIdRole, Plugin plugin )
-	{
-		return _dao.selectWssoUsersListForRole( nIdRole, plugin );
-	}
+    /**
+     * Returns a collection of wssoUsers objects for a role
+     * @param nIdRole The role id of the wssoUser
+     * @param plugin The current plugin using this method
+     * @return A collection of wssoUsers
+     */
+    public static Collection findWssoUsersListForRole( int nIdRole, Plugin plugin )
+    {
+        return _dao.selectWssoUsersListForRole( nIdRole, plugin );
+    }
 
-	/**
-	 * Returns a collection of wssoUsers objects for a guid
-	 * @param strGuid The guid of the wssoUser
-	 * @param plugin The current plugin using this method
-	 * @return A collection of wssoUsers
-	 */
-	public static Collection findWssoUsersListForGuid( String strGuid, Plugin plugin )
-	{
-		return _dao.selectWssoUserListForGuid( strGuid, plugin );
-	}
+    /**
+     * Returns a collection of wssoUsers objects for a guid
+     * @param strGuid The guid of the wssoUser
+     * @param plugin The current plugin using this method
+     * @return A collection of wssoUsers
+     */
+    public static Collection findWssoUsersListForGuid( String strGuid, Plugin plugin )
+    {
+        return _dao.selectWssoUserListForGuid( strGuid, plugin );
+    }
 }

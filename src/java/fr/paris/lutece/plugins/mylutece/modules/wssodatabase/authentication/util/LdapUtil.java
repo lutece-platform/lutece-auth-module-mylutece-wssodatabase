@@ -48,89 +48,93 @@ import javax.naming.directory.SearchControls;
  */
 public final class LdapUtil
 {
-	/**
-	 * Constructeur
-	 */
-	private LdapUtil( )
-	{
-		// empty contructor
-	}
+    /**
+     * Constructeur
+     */
+    private LdapUtil(  )
+    {
+        // empty contructor
+    }
 
-	/**
-	 * Search LDAP context
-	 * @param strLDAPContext the ldap context
-	 * @param strLDAPUrl the ldap url
-	 * @param strAdminDN the admin dn
-	 * @param strAdminPassword the admin password
-	 * @return a DirContext object
-	 * @throws NamingException in case of error
-	 */
-	public static DirContext getContext( String strLDAPContext, String strLDAPUrl, String strAdminDN, String strAdminPassword ) throws NamingException
-	{
-		Hashtable env = new Hashtable( );
+    /**
+     * Search LDAP context
+     * @param strLDAPContext the ldap context
+     * @param strLDAPUrl the ldap url
+     * @param strAdminDN the admin dn
+     * @param strAdminPassword the admin password
+     * @return a DirContext object
+     * @throws NamingException in case of error
+     */
+    public static DirContext getContext( String strLDAPContext, String strLDAPUrl, String strAdminDN,
+        String strAdminPassword ) throws NamingException
+    {
+        Hashtable env = new Hashtable(  );
 
-		env.put( Context.INITIAL_CONTEXT_FACTORY, strLDAPContext );
-		env.put( Context.PROVIDER_URL, strLDAPUrl );
-		env.put( Context.SECURITY_PRINCIPAL, strAdminDN );
-		env.put( Context.SECURITY_CREDENTIALS, strAdminPassword );
+        env.put( Context.INITIAL_CONTEXT_FACTORY, strLDAPContext );
+        env.put( Context.PROVIDER_URL, strLDAPUrl );
+        env.put( Context.SECURITY_PRINCIPAL, strAdminDN );
+        env.put( Context.SECURITY_CREDENTIALS, strAdminPassword );
 
-		DirContext context = new InitialDirContext( env );
+        DirContext context = new InitialDirContext( env );
 
-		return context;
-	}
+        return context;
+    }
 
-	/**
-	 * Free the context
-	 * @param context the context to free
-	 * @throws NamingException in case of error
-	 */
-	public static void freeContext( DirContext context ) throws NamingException
-	{
-		if ( context != null )
-		{
-			context.close( );
-		}
-	}
+    /**
+     * Free the context
+     * @param context the context to free
+     * @throws NamingException in case of error
+     */
+    public static void freeContext( DirContext context )
+        throws NamingException
+    {
+        if ( context != null )
+        {
+            context.close(  );
+        }
+    }
 
-	/**
-	 * Connects an user to the ldap
-	 * @param strLDAPContext the ldap context
-	 * @param strLDAPUrl the ldap url
-	 * @param strDN the dn
-	 * @param strPassword the password
-	 * @return a DirContext object
-	 * @throws NamingException in case of error
-	 */
-	public static DirContext bindUser( String strLDAPContext, String strLDAPUrl, String strDN, String strPassword ) throws NamingException
-	{
-		DirContext context = null;
+    /**
+     * Connects an user to the ldap
+     * @param strLDAPContext the ldap context
+     * @param strLDAPUrl the ldap url
+     * @param strDN the dn
+     * @param strPassword the password
+     * @return a DirContext object
+     * @throws NamingException in case of error
+     */
+    public static DirContext bindUser( String strLDAPContext, String strLDAPUrl, String strDN, String strPassword )
+        throws NamingException
+    {
+        DirContext context = null;
 
-		Hashtable env = new Hashtable( );
+        Hashtable env = new Hashtable(  );
 
-		env.put( Context.INITIAL_CONTEXT_FACTORY, strLDAPContext );
-		env.put( Context.PROVIDER_URL, strLDAPUrl );
-		env.put( Context.SECURITY_PRINCIPAL, strDN );
-		env.put( Context.SECURITY_CREDENTIALS, strPassword );
+        env.put( Context.INITIAL_CONTEXT_FACTORY, strLDAPContext );
+        env.put( Context.PROVIDER_URL, strLDAPUrl );
+        env.put( Context.SECURITY_PRINCIPAL, strDN );
+        env.put( Context.SECURITY_CREDENTIALS, strPassword );
 
-		context = new InitialDirContext( env );
+        context = new InitialDirContext( env );
 
-		return context;
-	}
+        return context;
+    }
 
-	/**
-	 * 
-	 * @param context the ldap context
-	 * @param strFilter the filter
-	 * @param strUserDN the user dn
-	 * @param strDNBase the base dn
-	 * @param sc the search controls
-	 * @return an enumeration of found elements
-	 * @throws NamingException in case of error
-	 */
-	public static NamingEnumeration searchUsers( DirContext context, String strFilter, String strUserDN, String strDNBase, SearchControls sc ) throws NamingException
-	{
-		NamingEnumeration enumeration = context.search( strUserDN + strDNBase, strFilter, sc );
+    /**
+     *
+     * @param context the ldap context
+     * @param strFilter the filter
+     * @param strUserDN the user dn
+     * @param strDNBase the base dn
+     * @param sc the search controls
+     * @return an enumeration of found elements
+     * @throws NamingException in case of error
+     */
+    public static NamingEnumeration searchUsers( DirContext context, String strFilter, String strUserDN,
+        String strDNBase, SearchControls sc ) throws NamingException
+    {
+        NamingEnumeration enumeration = context.search( strUserDN + strDNBase, strFilter, sc );
 
-		return enumeration;
-	}
+        return enumeration;
+    }
 }

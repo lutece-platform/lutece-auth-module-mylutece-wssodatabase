@@ -47,8 +47,7 @@ import fr.paris.lutece.portal.service.util.AppLogService;
  */
 public class WssoDatabaseService
 {
-	private static final String AUTHENTICATION_BEAN_NAME = "mylutece-wssodatabase.authentication";
-	
+    private static final String AUTHENTICATION_BEAN_NAME = "mylutece-wssodatabase.authentication";
     private static WssoDatabaseService _singleton = new WssoDatabaseService(  );
 
     /**
@@ -58,16 +57,19 @@ public class WssoDatabaseService
     public void init(  )
     {
         WssoUser.init(  );
-        IdxWSSODatabaseAuthentication baseAuthentication = ( IdxWSSODatabaseAuthentication ) SpringContextService.getPluginBean( 
-        		WssoDatabasePlugin.PLUGIN_NAME, AUTHENTICATION_BEAN_NAME );
+
+        IdxWSSODatabaseAuthentication baseAuthentication = (IdxWSSODatabaseAuthentication) SpringContextService.getPluginBean( WssoDatabasePlugin.PLUGIN_NAME,
+                AUTHENTICATION_BEAN_NAME );
+
         if ( baseAuthentication != null )
         {
-        	MultiLuteceAuthentication.registerAuthentication( baseAuthentication );
-	    }
-	    else
-	    {
-	    	AppLogService.error( "IdxWSSODatabaseAuthentication not found, please check your wssodatabase_context.xml configuration" );
-	    }
+            MultiLuteceAuthentication.registerAuthentication( baseAuthentication );
+        }
+        else
+        {
+            AppLogService.error( 
+                "IdxWSSODatabaseAuthentication not found, please check your wssodatabase_context.xml configuration" );
+        }
     }
 
     /**

@@ -44,7 +44,7 @@ import java.util.List;
 
 /**
  * Home for IdxWSSODatabase
- * 
+ *
  */
 public final class IdxWSSODatabaseHome
 {
@@ -54,7 +54,7 @@ public final class IdxWSSODatabaseHome
     /**
      * Private constructor - this class need not be instantiated
      */
-    private IdxWSSODatabaseHome( )
+    private IdxWSSODatabaseHome(  )
     {
     }
 
@@ -63,28 +63,28 @@ public final class IdxWSSODatabaseHome
 
     /**
      * Find users by guid
-     * 
+     *
      * @param strGuid the WSSO guid
      * @param plugin The Plugin using this data access service
      * @param authenticationService the LuteceAuthentication object
      * @return IdxWSSODatabaseUser the user corresponding to the guid
      */
     public static IdxWSSODatabaseUser findUserByGuid( String strGuid, Plugin plugin,
-            LuteceAuthentication authenticationService )
+        LuteceAuthentication authenticationService )
     {
         return _dao.findUserByGuid( strGuid, plugin, authenticationService );
     }
 
     /**
      * Find user's roles by guid
-     * 
+     *
      * @param strGuid the WSSO guid
      * @param plugin The Plugin using this data access service
      * @param authenticationService the LuteceAuthentication object
      * @return ArrayList the roles list corresponding to the guid
      */
     public static List<String> findUserRolesFromGuid( String strGuid, Plugin plugin,
-            LuteceAuthentication authenticationService )
+        LuteceAuthentication authenticationService )
     {
         return _dao.findUserRolesFromGuid( strGuid, plugin, authenticationService );
     }
@@ -102,13 +102,13 @@ public final class IdxWSSODatabaseHome
 
     /**
      * Find users by guid
-     * 
+     *
      * @param plugin The Plugin using this data access service
      * @param authenticationService the LuteceAuthentication object
      * @return IdxWSSODatabaseUser the user corresponding to the guid
      */
     public static Collection<IdxWSSODatabaseUser> findUsersList( Plugin plugin,
-            LuteceAuthentication authenticationService )
+        LuteceAuthentication authenticationService )
     {
         return _dao.findUsersList( plugin, authenticationService );
     }

@@ -39,69 +39,69 @@ import java.util.Collection;
 
 
 /**
- * 
+ *
  * @author Etienne
  */
 public interface IWssoUserDAO
 {
-	/**
-	 * Generates a new primary key
-	 * @param plugin The Plugin using this data access service
-	 * @return The new primary key
-	 */
-	int newPrimaryKey( Plugin plugin );
+    /**
+     * Generates a new primary key
+     * @param plugin The Plugin using this data access service
+     * @return The new primary key
+     */
+    int newPrimaryKey( Plugin plugin );
 
-	/**
-	 * Insert a new record in the table.
-	 * 
-	 * @param wssoUser The wssoUser object
-	 * @param plugin The Plugin using this data access service
-	 */
-	void insert( WssoUser wssoUser, Plugin plugin );
+    /**
+     * Insert a new record in the table.
+     *
+     * @param wssoUser The wssoUser object
+     * @param plugin The Plugin using this data access service
+     */
+    void insert( WssoUser wssoUser, Plugin plugin );
 
-	/**
-	 * Load the data of WssoUser from the table
-	 * 
-	 * @param nWssoUserId The identifier of WssoUser
-	 * @param plugin The Plugin using this data access service
-	 * @return the instance of the WssoUser
-	 */
-	WssoUser load( int nWssoUserId, Plugin plugin );
+    /**
+     * Load the data of WssoUser from the table
+     *
+     * @param nWssoUserId The identifier of WssoUser
+     * @param plugin The Plugin using this data access service
+     * @return the instance of the WssoUser
+     */
+    WssoUser load( int nWssoUserId, Plugin plugin );
 
-	/**
-	 * Delete a record from the table
-	 * @param wssoUser The WssoUser object
-	 * @param plugin The Plugin using this data access service
-	 */
-	void delete( WssoUser wssoUser, Plugin plugin );
+    /**
+     * Delete a record from the table
+     * @param wssoUser The WssoUser object
+     * @param plugin The Plugin using this data access service
+     */
+    void delete( WssoUser wssoUser, Plugin plugin );
 
-	/**
-	 * Update the record in the table
-	 * @param wssoUser The reference of wssoUser
-	 * @param plugin The Plugin using this data access service
-	 */
-	void store( WssoUser wssoUser, Plugin plugin );
+    /**
+     * Update the record in the table
+     * @param wssoUser The reference of wssoUser
+     * @param plugin The Plugin using this data access service
+     */
+    void store( WssoUser wssoUser, Plugin plugin );
 
-	/**
-	 * Load the list of wssoUsers
-	 * @param plugin The Plugin using this data access service
-	 * @return The Collection of the WssoUsers
-	 */
-	Collection selectWssoUserList( Plugin plugin );
+    /**
+     * Load the list of wssoUsers
+     * @param plugin The Plugin using this data access service
+     * @return The Collection of the WssoUsers
+     */
+    Collection selectWssoUserList( Plugin plugin );
 
-	/**
-	 * Load the list of wssoUsers for a role
-	 * @param nIdRole The role of WssoUser
-	 * @param plugin The Plugin using this data access service
-	 * @return The Collection of the WssoUsers
-	 */
-	Collection selectWssoUsersListForRole( int nIdRole, Plugin plugin );
+    /**
+     * Load the list of wssoUsers for a role
+     * @param nIdRole The role of WssoUser
+     * @param plugin The Plugin using this data access service
+     * @return The Collection of the WssoUsers
+     */
+    Collection selectWssoUsersListForRole( int nIdRole, Plugin plugin );
 
-	/**
-	 * Load the list of wssoUsers for a guid
-	 * @param strGuid The guid of WssoUser
-	 * @param plugin The Plugin using this data access service
-	 * @return The Collection of the WssoUsers
-	 */
-	Collection selectWssoUserListForGuid( String strGuid, Plugin plugin );
+    /**
+     * Load the list of wssoUsers for a guid
+     * @param strGuid The guid of WssoUser
+     * @param plugin The Plugin using this data access service
+     * @return The Collection of the WssoUsers
+     */
+    Collection selectWssoUserListForGuid( String strGuid, Plugin plugin );
 }

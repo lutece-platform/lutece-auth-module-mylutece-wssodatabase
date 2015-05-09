@@ -42,45 +42,45 @@ import java.util.List;
 
 
 /**
- * 
+ *
  * @author Etienne
  */
 public interface IIdxWSSODatabaseDAO
 {
-	/**
-	 * Find users by guid
-	 * 
-	 * @param strGuid the WSSO guid
-	 * @param plugin The Plugin using this data access service
-	 * @param authenticationService the LuteceAuthentication object
-	 * @return IdxWSSODatabaseUser the user corresponding to the guid
-	 */
-	IdxWSSODatabaseUser findUserByGuid( String strGuid, Plugin plugin, LuteceAuthentication authenticationService );
+    /**
+     * Find users by guid
+     *
+     * @param strGuid the WSSO guid
+     * @param plugin The Plugin using this data access service
+     * @param authenticationService the LuteceAuthentication object
+     * @return IdxWSSODatabaseUser the user corresponding to the guid
+     */
+    IdxWSSODatabaseUser findUserByGuid( String strGuid, Plugin plugin, LuteceAuthentication authenticationService );
 
-	/**
-	 * Find user's roles by guid
-	 * 
-	 * @param strGuid the WSSO guid
-	 * @param plugin The Plugin using this data access service
-	 * @param authenticationService the LuteceAuthentication object
-	 * @return ArrayList the roles list corresponding to the guid
-	 */
-	List<String> findUserRolesFromGuid( String strGuid, Plugin plugin, LuteceAuthentication authenticationService );
+    /**
+     * Find user's roles by guid
+     *
+     * @param strGuid the WSSO guid
+     * @param plugin The Plugin using this data access service
+     * @param authenticationService the LuteceAuthentication object
+     * @return ArrayList the roles list corresponding to the guid
+     */
+    List<String> findUserRolesFromGuid( String strGuid, Plugin plugin, LuteceAuthentication authenticationService );
 
-	/**
-	 * Update the date of last login of a user
-	 * @param strGuid The GUID of the user to update
-	 * @param dateLastLogin The new last connection date
-	 * @param plugin The plugin
-	 */
-	void updateDateLastLogin( String strGuid, java.util.Date dateLastLogin, Plugin plugin );
+    /**
+     * Update the date of last login of a user
+     * @param strGuid The GUID of the user to update
+     * @param dateLastLogin The new last connection date
+     * @param plugin The plugin
+     */
+    void updateDateLastLogin( String strGuid, java.util.Date dateLastLogin, Plugin plugin );
 
-	/**
-	 * Find users list
-	 * 
-	 * @param plugin The Plugin using this data access service
-	 * @param authenticationService the LuteceAuthentication object
-	 * @return A Collection of users
-	 */
-	Collection<IdxWSSODatabaseUser> findUsersList( Plugin plugin, LuteceAuthentication authenticationService );
+    /**
+     * Find users list
+     *
+     * @param plugin The Plugin using this data access service
+     * @param authenticationService the LuteceAuthentication object
+     * @return A Collection of users
+     */
+    Collection<IdxWSSODatabaseUser> findUsersList( Plugin plugin, LuteceAuthentication authenticationService );
 }

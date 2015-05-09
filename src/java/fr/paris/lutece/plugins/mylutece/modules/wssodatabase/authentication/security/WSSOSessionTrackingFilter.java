@@ -33,6 +33,12 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.security;
 
+import fr.paris.lutece.portal.service.security.LuteceUser;
+import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
+
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -44,12 +50,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
-
-import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.security.SecurityService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
 
 /**
  * Filter Used for checking if the user logged in
@@ -57,7 +57,6 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
  */
 public class WSSOSessionTrackingFilter implements Filter
 {
-
     private static final String PROPERTY_COOKIE_WSSOGUID = "mylutece-wssodatabase.cookie.wssoguid"; // unique hexa user id
 
     /**
@@ -85,39 +84,34 @@ public class WSSOSessionTrackingFilter implements Filter
         throws IOException, ServletException
     {
         HttpServletRequest req = (HttpServletRequest) request;
-        LuteceUser user= SecurityService.getInstance().getRegisteredUser(req);
-        
-        if(user != null)
+        LuteceUser user = SecurityService.getInstance(  ).getRegisteredUser( req );
+
+        if ( user != null )
         {
-	        Cookie[] cookies = req.getCookies();
-			String strUserID = null;
-	
-			if ( cookies != null )
-			{
-				for ( int i = 0; i < cookies.length; i++ )
-				{
-					Cookie cookie = cookies[i];
-	
-					if ( cookie.getName( ).equals( AppPropertiesService.getProperty( PROPERTY_COOKIE_WSSOGUID ) ) )
-					{
-						strUserID = cookie.getValue( );
-						if(!StringUtils.isEmpty(strUserID) && !strUserID.equals(user.getName()))
-						{
-							
-							SecurityService.getInstance().unregisterUser(req);
-							
-						}
-						
-						break;
-						
-					}
-				}
-			}
+            Cookie[] cookies = req.getCookies(  );
+            String strUserID = null;
+
+            if ( cookies != null )
+            {
+                for ( int i = 0; i < cookies.length; i++ )
+                {
+                    Cookie cookie = cookies[i];
+
+                    if ( cookie.getName(  ).equals( AppPropertiesService.getProperty( PROPERTY_COOKIE_WSSOGUID ) ) )
+                    {
+                        strUserID = cookie.getValue(  );
+
+                        if ( !StringUtils.isEmpty( strUserID ) && !strUserID.equals( user.getName(  ) ) )
+                        {
+                            SecurityService.getInstance(  ).unregisterUser( req );
+                        }
+
+                        break;
+                    }
+                }
+            }
         }
-			
-       
+
         chain.doFilter( request, response );
     }
-
-    
 }
