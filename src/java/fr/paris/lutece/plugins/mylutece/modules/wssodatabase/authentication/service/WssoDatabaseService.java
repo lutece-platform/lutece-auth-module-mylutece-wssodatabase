@@ -33,12 +33,26 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+
 import fr.paris.lutece.plugins.mylutece.authentication.MultiLuteceAuthentication;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.IdxWSSODatabaseAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.IdxWSSODatabaseUser;
+import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business.IdxWSSODatabaseHome;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business.WssoUser;
+import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.portal.service.security.LuteceAuthentication;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
-
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 /**
  *
@@ -48,18 +62,75 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 public class WssoDatabaseService
 {
     private static final String AUTHENTICATION_BEAN_NAME = "mylutece-wssodatabase.authentication";
-    private static WssoDatabaseService _singleton = new WssoDatabaseService(  );
+    private static final String PROPERTY_LOAD_ALL_USER_INFORMATIONS_FROM_WSSO = "mylutece-wssodatabase.loadAllUserInformationsFromWsso";
+    private static final String PROPERTY_USER_MAPPING_ATTRIBUTES = "mylutece-wssodatabase.userMappingAttributes";
+    // true if the user informations informations must be load from wsso
+    private boolean _bLoadAllUserInformationsFomWsso;
+    private static final String CONSTANT_LUTECE_USER_PROPERTIES_PATH = "mylutece-oauth2.attribute";
+    private Map<String, List<String>> ATTRIBUTE_USER_MAPPING;
+    private static final String SEPARATOR = ",";
+
+    private static WssoDatabaseService _singleton = new WssoDatabaseService( );
 
     /**
-    * Initialize the WssoDatabase service
-    *
-    */
-    public void init(  )
+     * Initialize the WssoDatabase service
+     *
+     */
+    public void init( )
     {
-        WssoUser.init(  );
+        WssoUser.init( );
 
         IdxWSSODatabaseAuthentication baseAuthentication = (IdxWSSODatabaseAuthentication) SpringContextService.getPluginBean( WssoDatabasePlugin.PLUGIN_NAME,
                 AUTHENTICATION_BEAN_NAME );
+        _bLoadAllUserInformationsFomWsso = AppPropertiesService.getPropertyBoolean( PROPERTY_LOAD_ALL_USER_INFORMATIONS_FROM_WSSO, false );
+
+        if ( _bLoadAllUserInformationsFomWsso )
+        {
+            String strUserMappingAttributes = AppPropertiesService.getProperty( PROPERTY_USER_MAPPING_ATTRIBUTES );
+
+            ATTRIBUTE_USER_MAPPING = new HashMap<String, List<String>>( );
+
+            if ( StringUtils.isNotBlank( strUserMappingAttributes ) )
+            {
+                String [ ] tabUserProperties = strUserMappingAttributes.split( SEPARATOR );
+                String [ ] tabPropertiesValues;
+                String userProperties;
+
+                for ( int i = 0; i < tabUserProperties.length; i++ )
+                {
+                    userProperties = AppPropertiesService.getProperty( CONSTANT_LUTECE_USER_PROPERTIES_PATH + "." + tabUserProperties [i] );
+
+                    if ( StringUtils.isNotBlank( userProperties ) )
+                    {
+
+                        if ( userProperties.contains( SEPARATOR ) )
+                        {
+                            tabPropertiesValues = userProperties.split( SEPARATOR );
+
+                            for ( int n = 0; i < tabPropertiesValues.length; n++ )
+                            {
+                                if ( !ATTRIBUTE_USER_MAPPING.containsKey( tabPropertiesValues [n] ) )
+                                {
+                                    ATTRIBUTE_USER_MAPPING.put( tabPropertiesValues [n], new ArrayList<String>( ) );
+                                }
+                                ATTRIBUTE_USER_MAPPING.get( tabPropertiesValues [n] ).add( tabUserProperties [i] );
+                            }
+
+                        }
+                        else
+                        {
+
+                            if ( !ATTRIBUTE_USER_MAPPING.containsKey( userProperties ) )
+                            {
+                                ATTRIBUTE_USER_MAPPING.put( userProperties, new ArrayList<String>( ) );
+                            }
+                            ATTRIBUTE_USER_MAPPING.get( userProperties ).add( tabUserProperties [i] );
+                        }
+
+                    }
+                }
+            }
+        }
 
         if ( baseAuthentication != null )
         {
@@ -67,9 +138,81 @@ public class WssoDatabaseService
         }
         else
         {
-            AppLogService.error( 
-                "IdxWSSODatabaseAuthentication not found, please check your wssodatabase_context.xml configuration" );
+            AppLogService.error( "IdxWSSODatabaseAuthentication not found, please check your wssodatabase_context.xml configuration" );
         }
+    }
+
+    
+
+    /**
+     * Load IdxWssoUSer
+     * @param strUserID the userId
+     * @param request the request
+     * @param authenticationService the authentication service
+     * @param plugin the plugin
+     * @return IdxWSSODatabaseUser
+     */
+    public IdxWSSODatabaseUser loadIdxWSSOUser( String strUserID, HttpServletRequest request, LuteceAuthentication authenticationService ,Plugin plugin)
+    {
+        IdxWSSODatabaseUser user =null;
+        if ( !isLoadAllUserInformationsFromWssoEnabled( ) )
+        {
+            user = IdxWSSODatabaseHome.findUserByGuid( strUserID, plugin, authenticationService );
+        }
+        else
+        {
+            Cookie [ ] cookies = request.getCookies( );
+
+             user = new IdxWSSODatabaseUser( strUserID, authenticationService );
+            if ( cookies != null )
+            {
+                for ( int i = 0; i < cookies.length; i++ )
+                {
+
+                    if ( ATTRIBUTE_USER_MAPPING.containsKey( cookies [i].getName( ) ) )
+                    {
+                        for ( String strUserInfo : ATTRIBUTE_USER_MAPPING.get( cookies [i].getName( ) ) )
+                        {
+                            Object val = cookies [i].getValue( );
+                            if ( val instanceof ArrayList<?> )
+                            {
+
+                                StringBuffer strBufVal = new StringBuffer( );
+                                for ( String tabVal : (ArrayList<String>) val )
+                                {
+                                    strBufVal.append( tabVal );
+                                    strBufVal.append( SEPARATOR );
+                                }
+                                if ( strBufVal.length( ) > 0 )
+                                {
+                                    user.setUserInfo( strUserInfo, strBufVal.substring( 0, strBufVal.length( ) - 1 ) );
+                                }
+
+                                user.setUserInfo( strUserInfo, strBufVal.toString( ) );
+
+                            }
+                            else
+                            {
+                                user.setUserInfo( strUserInfo, (String) val );
+
+                            }
+                        }
+                    }
+                }
+
+            }
+          
+        }
+        return user;
+    }
+    /**
+     * 
+     * @return true if the user informations informations must be load from wsso
+     */
+    private boolean isLoadAllUserInformationsFromWssoEnabled( )
+    {
+
+        return _bLoadAllUserInformationsFomWsso;
     }
 
     /**
@@ -77,7 +220,7 @@ public class WssoDatabaseService
      *
      * @return The instance of the singleton
      */
-    public static WssoDatabaseService getInstance(  )
+    public static WssoDatabaseService getInstance( )
     {
         return _singleton;
     }

@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication;
 import fr.paris.lutece.plugins.mylutece.authentication.ExternalAuthentication;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business.IdxWSSODatabaseHome;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.service.WssoDatabasePlugin;
+import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.service.WssoDatabaseService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
@@ -59,6 +60,7 @@ public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
     private static final String PROPERTY_AUTH_SERVICE_NAME = "mylutece-wssodatabase.service.name";
     private static final String PROPERTY_COOKIE_AUTHENTIFICATION = "mylutece-wssodatabase.cookie.authenticationMode"; // authentication mode, login/pwd or certificate
     private static final String PROPERTY_COOKIE_WSSOGUID = "mylutece-wssodatabase.cookie.wssoguid"; // unique hexa user id
+    
     private static final String PLUGIN_NAME = "mylutece-wssodatabase";
 
     /**
@@ -194,7 +196,7 @@ public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
         if ( strUserID != null )
         {
             Plugin plugin = PluginService.getPlugin( PLUGIN_NAME );
-            user = IdxWSSODatabaseHome.findUserByGuid( strUserID, plugin, this );
+            user = WssoDatabaseService.getInstance( ).loadIdxWSSOUser( strUserID, request,this,plugin );
 
             if ( user != null )
             {
