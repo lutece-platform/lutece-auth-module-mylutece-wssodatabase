@@ -66,7 +66,7 @@ public class WssoDatabaseService
     private static final String PROPERTY_USER_MAPPING_ATTRIBUTES = "mylutece-wssodatabase.userMappingAttributes";
     // true if the user informations informations must be load from wsso
     private boolean _bLoadAllUserInformationsFomWsso;
-    private static final String CONSTANT_LUTECE_USER_PROPERTIES_PATH = "mylutece-oauth2.attribute";
+    private static final String CONSTANT_LUTECE_USER_PROPERTIES_PATH = "mylutece-wssodatabase.attribute";
     private Map<String, List<String>> ATTRIBUTE_USER_MAPPING;
     private static final String SEPARATOR = ",";
 
