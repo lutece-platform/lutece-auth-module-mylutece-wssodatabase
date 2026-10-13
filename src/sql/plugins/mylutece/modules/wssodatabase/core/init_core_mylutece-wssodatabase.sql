@@ -1,3 +1,7 @@
+-- liquibase formatted sql
+-- changeset mylutece-wssodatabase:init_core_mylutece-wssodatabase.sql
+-- preconditions onFail:MARK_RAN onError:WARN
+-- precondition-sql-check expectedResult:0 SELECT COUNT(*) FROM core_admin_right WHERE id_right = 'WSSODATABASE_MANAGEMENT_USERS'
 --
 -- Dumping data for table core_admin_right
 --

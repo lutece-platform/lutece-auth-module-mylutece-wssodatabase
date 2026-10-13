@@ -45,6 +45,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import java.nio.file.Paths;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -158,7 +160,7 @@ public class WssoUsersFileGeneratorService
         //String buffer for building the response page
         StringBuffer sbLogs = new StringBuffer(  );
         String strFileName = AppPropertiesService.getProperty( PROPERTY_XML_FILE_NAME );
-        String strFolderPath = AppPathService.getPath( PROPERTY_XML_STORAGE_FOLDER_PATH, "" );
+        String strFolderPath = getFolderPath(  );
 
         try
         {
@@ -166,7 +168,7 @@ public class WssoUsersFileGeneratorService
             if ( !new File( strFolderPath ).exists(  ) )
             {
                 File fileFolder = new File( strFolderPath );
-                fileFolder.mkdir(  );
+                fileFolder.mkdirs(  );
             }
 
             // Creates a temporary XML file
@@ -203,7 +205,7 @@ public class WssoUsersFileGeneratorService
      */
     public static void removeXmlFile(  )
     {
-        String strFileXml = AppPathService.getPath( PROPERTY_XML_STORAGE_FOLDER_PATH, "" ) +
+        String strFileXml = getFolderPath(  ) +
             AppPropertiesService.getProperty( PROPERTY_XML_FILE_NAME );
         File file = new File( strFileXml );
 
@@ -212,5 +214,15 @@ public class WssoUsersFileGeneratorService
         {
             file.delete(  );
         }
+    }
+
+    /**
+     * Returns the absolute path of the export folder, ending with a separator, whether it exists or not.
+     *
+     * @return the export folder path
+     */
+    private static String getFolderPath(  )
+    {
+        return Paths.get( AppPathService.getWebAppPath(  ), AppPropertiesService.getProperty( PROPERTY_XML_STORAGE_FOLDER_PATH ) ).toString(  ) + File.separator;
     }
 }

@@ -42,19 +42,25 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.inject.Named;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
  * The Class provides an implementation of the PortalService interface based on a the IdealX WebSSO solution. It retrieves roles associated with the user from the database.
  */
+@ApplicationScoped
+@Named( "mylutece-wssodatabase.authentication" )
 public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
 {
     private static final String PROPERTY_AUTH_SERVICE_NAME = "mylutece-wssodatabase.service.name";
@@ -88,14 +94,16 @@ public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
     {
         Cookie[] cookies = request.getCookies(  );
         String strAuthType = request.getAuthType(  );
+        String strCookieName = AppPropertiesService.getProperty( PROPERTY_COOKIE_AUTHENTIFICATION );
 
-        for ( int i = 0; i < cookies.length; i++ )
+        if ( cookies != null )
         {
-            Cookie cookie = cookies[i];
-
-            if ( cookie.getName(  ).equals( PROPERTY_COOKIE_AUTHENTIFICATION ) )
+            for ( Cookie cookie : cookies )
             {
-                strAuthType = cookie.getValue(  );
+                if ( cookie.getName(  ).equals( strCookieName ) )
+                {
+                    strAuthType = cookie.getValue(  );
+                }
             }
         }
 
@@ -196,7 +204,7 @@ public class IdxWSSODatabaseAuthentication extends ExternalAuthentication
         if ( strUserID != null )
         {
             Plugin plugin = PluginService.getPlugin( PLUGIN_NAME );
-            user = WssoDatabaseService.getInstance( ).loadIdxWSSOUser( strUserID, request,this,plugin );
+            user = CDI.current( ).select( WssoDatabaseService.class ).get( ).loadIdxWSSOUser( strUserID, request, this, plugin );
 
             if ( user != null )
             {

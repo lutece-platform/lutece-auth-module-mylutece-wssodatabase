@@ -33,22 +33,17 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.service;
 
-import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
-
-
 /**
- * class WssoDatabasePlugin
+ * Constants of the plugin.
  */
-public class WssoDatabasePlugin extends PluginDefaultImplementation
+public final class WssoDatabasePlugin
 {
     public static final String PLUGIN_NAME = "mylutece-wssodatabase";
 
     /**
-     * Initialize the module WssoDatabase
+     * Prevents instantiation.
      */
-    public void init(  )
+    private WssoDatabasePlugin( )
     {
-        // Initialize the WssoDatabase service
-        WssoDatabaseService.getInstance(  ).init(  );
     }
 }

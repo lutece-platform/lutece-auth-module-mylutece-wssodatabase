@@ -33,195 +33,140 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang3.StringUtils;
-
 import fr.paris.lutece.plugins.mylutece.authentication.MultiLuteceAuthentication;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.IdxWSSODatabaseAuthentication;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.IdxWSSODatabaseUser;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business.IdxWSSODatabaseHome;
-import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business.WssoUser;
+import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business.WssoUserRoleRemovalListener;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.security.LuteceAuthentication;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.portal.service.util.BeanUtils;
+import fr.paris.lutece.portal.service.util.RemovalListenerService;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Initialized;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
- *
- * LdapDatabaseService
- *
+ * Registers the WSSO authentication and loads the WSSO users.
  */
+@ApplicationScoped
 public class WssoDatabaseService
 {
-    private static final String AUTHENTICATION_BEAN_NAME = "mylutece-wssodatabase.authentication";
     private static final String PROPERTY_LOAD_ALL_USER_INFORMATIONS_FROM_WSSO = "mylutece-wssodatabase.loadAllUserInformationsFromWsso";
     private static final String PROPERTY_USER_MAPPING_ATTRIBUTES = "mylutece-wssodatabase.userMappingAttributes";
-    // true if the user informations informations must be load from wsso
-    private boolean _bLoadAllUserInformationsFomWsso;
     private static final String CONSTANT_LUTECE_USER_PROPERTIES_PATH = "mylutece-wssodatabase.attribute";
-    private Map<String, List<String>> ATTRIBUTE_USER_MAPPING;
     private static final String SEPARATOR = ",";
 
-    private static WssoDatabaseService _singleton = new WssoDatabaseService( );
+    @Inject
+    private IdxWSSODatabaseAuthentication _authentication;
+
+    @Inject
+    @Named( BeanUtils.BEAN_ROLE_REMOVAL_SERVICE )
+    private RemovalListenerService _roleRemovalService;
+
+    @Inject
+    @ConfigProperty( name = PROPERTY_LOAD_ALL_USER_INFORMATIONS_FROM_WSSO, defaultValue = "false" )
+    private boolean _bLoadAllUserInformationsFromWsso;
+
+    @Inject
+    @ConfigProperty( name = PROPERTY_USER_MAPPING_ATTRIBUTES )
+    private Optional<String> _strUserMappingAttributes;
+
+    private final Map<String, List<String>> _mapAttributeUserMapping = new HashMap<>( );
 
     /**
-     * Initialize the WssoDatabase service
+     * Registers the authentication and the role removal listener when the application starts.
      *
+     * @param context
+     *            the servlet context
      */
-    public void init( )
+    public void initializedService( @Observes @Initialized( ApplicationScoped.class ) ServletContext context )
     {
-        WssoUser.init( );
-
-        IdxWSSODatabaseAuthentication baseAuthentication = (IdxWSSODatabaseAuthentication) SpringContextService.getPluginBean( WssoDatabasePlugin.PLUGIN_NAME,
-                AUTHENTICATION_BEAN_NAME );
-        _bLoadAllUserInformationsFomWsso = AppPropertiesService.getPropertyBoolean( PROPERTY_LOAD_ALL_USER_INFORMATIONS_FROM_WSSO, false );
-
-        if ( _bLoadAllUserInformationsFomWsso )
+        _roleRemovalService.registerListener( new WssoUserRoleRemovalListener( ) );
+        if ( _bLoadAllUserInformationsFromWsso )
         {
-            String strUserMappingAttributes = AppPropertiesService.getProperty( PROPERTY_USER_MAPPING_ATTRIBUTES );
+            loadAttributeUserMapping( );
+        }
 
-            ATTRIBUTE_USER_MAPPING = new HashMap<String, List<String>>( );
+        MultiLuteceAuthentication.registerAuthentication( _authentication );
+    }
 
-            if ( StringUtils.isNotBlank( strUserMappingAttributes ) )
+    /**
+     * Reads the mapping between the WSSO cookies and the Lutece user attributes.
+     */
+    private void loadAttributeUserMapping( )
+    {
+        String strUserMappingAttributes = _strUserMappingAttributes.orElse( null );
+
+        if ( StringUtils.isBlank( strUserMappingAttributes ) )
+        {
+            return;
+        }
+
+        for ( String strUserProperty : strUserMappingAttributes.split( SEPARATOR ) )
+        {
+            String strCookieNames = AppPropertiesService.getProperty( CONSTANT_LUTECE_USER_PROPERTIES_PATH + "." + strUserProperty );
+
+            if ( StringUtils.isNotBlank( strCookieNames ) )
             {
-                String [ ] tabUserProperties = strUserMappingAttributes.split( SEPARATOR );
-                String [ ] tabPropertiesValues;
-                String userProperties;
-
-                for ( int i = 0; i < tabUserProperties.length; i++ )
+                for ( String strCookieName : strCookieNames.split( SEPARATOR ) )
                 {
-                    userProperties = AppPropertiesService.getProperty( CONSTANT_LUTECE_USER_PROPERTIES_PATH + "." + tabUserProperties [i] );
-
-                    if ( StringUtils.isNotBlank( userProperties ) )
-                    {
-
-                        if ( userProperties.contains( SEPARATOR ) )
-                        {
-                            tabPropertiesValues = userProperties.split( SEPARATOR );
-
-                            for ( int n = 0; i < tabPropertiesValues.length; n++ )
-                            {
-                                if ( !ATTRIBUTE_USER_MAPPING.containsKey( tabPropertiesValues [n] ) )
-                                {
-                                    ATTRIBUTE_USER_MAPPING.put( tabPropertiesValues [n], new ArrayList<String>( ) );
-                                }
-                                ATTRIBUTE_USER_MAPPING.get( tabPropertiesValues [n] ).add( tabUserProperties [i] );
-                            }
-
-                        }
-                        else
-                        {
-
-                            if ( !ATTRIBUTE_USER_MAPPING.containsKey( userProperties ) )
-                            {
-                                ATTRIBUTE_USER_MAPPING.put( userProperties, new ArrayList<String>( ) );
-                            }
-                            ATTRIBUTE_USER_MAPPING.get( userProperties ).add( tabUserProperties [i] );
-                        }
-
-                    }
+                    _mapAttributeUserMapping.computeIfAbsent( strCookieName, k -> new ArrayList<>( ) ).add( strUserProperty );
                 }
             }
-        }
-
-        if ( baseAuthentication != null )
-        {
-            MultiLuteceAuthentication.registerAuthentication( baseAuthentication );
-        }
-        else
-        {
-            AppLogService.error( "IdxWSSODatabaseAuthentication not found, please check your wssodatabase_context.xml configuration" );
         }
     }
 
-    
-
     /**
-     * Load IdxWssoUSer
-     * @param strUserID the userId
-     * @param request the request
-     * @param authenticationService the authentication service
-     * @param plugin the plugin
-     * @return IdxWSSODatabaseUser
+     * Loads a WSSO user, from the database or from the WSSO cookies.
+     *
+     * @param strUserID
+     *            the WSSO guid
+     * @param request
+     *            the request
+     * @param authenticationService
+     *            the authentication service
+     * @param plugin
+     *            the plugin
+     * @return the user, or null if the database does not know the guid
      */
-    public IdxWSSODatabaseUser loadIdxWSSOUser( String strUserID, HttpServletRequest request, LuteceAuthentication authenticationService ,Plugin plugin)
+    public IdxWSSODatabaseUser loadIdxWSSOUser( String strUserID, HttpServletRequest request, LuteceAuthentication authenticationService, Plugin plugin )
     {
-        IdxWSSODatabaseUser user =null;
-        if ( !isLoadAllUserInformationsFromWssoEnabled( ) )
+        if ( !_bLoadAllUserInformationsFromWsso )
         {
-            user = IdxWSSODatabaseHome.findUserByGuid( strUserID, plugin, authenticationService );
+            return IdxWSSODatabaseHome.findUserByGuid( strUserID, plugin, authenticationService );
         }
-        else
-        {
-            Cookie [ ] cookies = request.getCookies( );
 
-             user = new IdxWSSODatabaseUser( strUserID, authenticationService );
-            if ( cookies != null )
+        IdxWSSODatabaseUser user = new IdxWSSODatabaseUser( strUserID, authenticationService );
+        Cookie [ ] cookies = request.getCookies( );
+
+        if ( cookies != null )
+        {
+            for ( Cookie cookie : cookies )
             {
-                for ( int i = 0; i < cookies.length; i++ )
+                for ( String strUserInfo : _mapAttributeUserMapping.getOrDefault( cookie.getName( ), List.of( ) ) )
                 {
-
-                    if ( ATTRIBUTE_USER_MAPPING.containsKey( cookies [i].getName( ) ) )
-                    {
-                        for ( String strUserInfo : ATTRIBUTE_USER_MAPPING.get( cookies [i].getName( ) ) )
-                        {
-                            Object val = cookies [i].getValue( );
-                            if ( val instanceof ArrayList<?> )
-                            {
-
-                                StringBuffer strBufVal = new StringBuffer( );
-                                for ( String tabVal : (ArrayList<String>) val )
-                                {
-                                    strBufVal.append( tabVal );
-                                    strBufVal.append( SEPARATOR );
-                                }
-                                if ( strBufVal.length( ) > 0 )
-                                {
-                                    user.setUserInfo( strUserInfo, strBufVal.substring( 0, strBufVal.length( ) - 1 ) );
-                                }
-
-                                user.setUserInfo( strUserInfo, strBufVal.toString( ) );
-
-                            }
-                            else
-                            {
-                                user.setUserInfo( strUserInfo, (String) val );
-
-                            }
-                        }
-                    }
+                    user.setUserInfo( strUserInfo, cookie.getValue( ) );
                 }
-
             }
-          
         }
+
         return user;
-    }
-    /**
-     * 
-     * @return true if the user informations informations must be load from wsso
-     */
-    private boolean isLoadAllUserInformationsFromWssoEnabled( )
-    {
-
-        return _bLoadAllUserInformationsFomWsso;
-    }
-
-    /**
-     * Returns the instance of the singleton
-     *
-     * @return The instance of the singleton
-     */
-    public static WssoDatabaseService getInstance( )
-    {
-        return _singleton;
     }
 }

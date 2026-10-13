@@ -36,7 +36,7 @@ package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.bus
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.IdxWSSODatabaseUser;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.security.LuteceAuthentication;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,7 +49,7 @@ import java.util.List;
 public final class IdxWSSODatabaseHome
 {
     // Static variable pointed at the DAO instance
-    private static IIdxWSSODatabaseDAO _dao = SpringContextService.getBean( "mylutece-wssodatabase.idxWSSODatabaseDAO" );
+    private static IIdxWSSODatabaseDAO _dao = CDI.current( ).select( IIdxWSSODatabaseDAO.class ).get( );
 
     /**
      * Private constructor - this class need not be instantiated
