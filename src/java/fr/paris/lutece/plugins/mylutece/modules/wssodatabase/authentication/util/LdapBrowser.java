@@ -200,8 +200,7 @@ public class LdapBrowser
         }
         catch ( CommunicationException e )
         {
-            AppLogService.error( "Error while searching for users '" + "' with search filter : " +
-                getDebugInfo( strUserSearchFilter ), e );
+            AppLogService.error( "Error while searching for users with search filter : {}", getDebugInfo( strUserSearchFilter ), e );
 
             return null;
         }
@@ -300,7 +299,7 @@ public class LdapBrowser
             // More than one user found (failure)
             if ( count > 1 )
             {
-                AppLogService.error( "More than one entry in the directory for id " + strId );
+                AppLogService.error( "More than one entry in the directory for id {}", strId );
 
                 return null;
             }
@@ -309,8 +308,7 @@ public class LdapBrowser
         }
         catch ( CommunicationException e )
         {
-            AppLogService.error( "Error while searching for users '" + "' with search filter : " +
-                getDebugInfo( strUserSearchFilter ), e );
+            AppLogService.error( "Error while searching for users with search filter : {}", getDebugInfo( strUserSearchFilter ), e );
 
             return null;
         }
@@ -428,7 +426,7 @@ public class LdapBrowser
      */
     private int getUserDnSearchScope(  )
     {
-        String strSearchScope = AppPropertiesService.getProperty( PROPERTY_USER_SUBTREE );
+        String strSearchScope = AppPropertiesService.getProperty( PROPERTY_USER_SUBTREE, "" );
 
         if ( strSearchScope.equalsIgnoreCase( "true" ) )
         {
@@ -444,7 +442,7 @@ public class LdapBrowser
      */
     private String getBindDn(  )
     {
-        return AppPropertiesService.getProperty( PROPERTY_BIND_DN );
+        return AppPropertiesService.getProperty( PROPERTY_BIND_DN, "" );
     }
 
     /**
@@ -453,7 +451,7 @@ public class LdapBrowser
      */
     private String getBindPassword(  )
     {
-        return AppPropertiesService.getProperty( PROPERTY_BIND_PASSWORD );
+        return AppPropertiesService.getProperty( PROPERTY_BIND_PASSWORD, "" );
     }
 
     /**

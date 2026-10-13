@@ -87,7 +87,7 @@ public interface IWssoUserDAO
      * @param plugin The Plugin using this data access service
      * @return The Collection of the WssoUsers
      */
-    Collection selectWssoUserList( Plugin plugin );
+    Collection<WssoUser> selectWssoUserList( Plugin plugin );
 
     /**
      * Load the list of wssoUsers for a role
@@ -95,7 +95,7 @@ public interface IWssoUserDAO
      * @param plugin The Plugin using this data access service
      * @return The Collection of the WssoUsers
      */
-    Collection selectWssoUsersListForRole( int nIdRole, Plugin plugin );
+    Collection<WssoUser> selectWssoUsersListForRole( int nIdRole, Plugin plugin );
 
     /**
      * Load the list of wssoUsers for a guid
@@ -103,5 +103,5 @@ public interface IWssoUserDAO
      * @param plugin The Plugin using this data access service
      * @return The Collection of the WssoUsers
      */
-    Collection selectWssoUserListForGuid( String strGuid, Plugin plugin );
+    Collection<WssoUser> selectWssoUserListForGuid( String strGuid, Plugin plugin );
 }

@@ -34,7 +34,7 @@
 package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
 
 import java.util.Collection;
 
@@ -45,8 +45,7 @@ import java.util.Collection;
 public final class WssoUserHome
 {
     // Static variable pointed at the DAO instance
-    private static IWssoUserDAO _dao = (IWssoUserDAO) SpringContextService.getPluginBean( "mylutece-wssodatabase",
-            "mylutece-wssodatabase.wssoUserDAO" );
+    private static IWssoUserDAO _dao = CDI.current( ).select( IWssoUserDAO.class ).get( );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -114,7 +113,7 @@ public final class WssoUserHome
      * @param plugin The current plugin using this method
      * @return A collection of wssoUsers
      */
-    public static Collection findWssoUsersList( Plugin plugin )
+    public static Collection<WssoUser> findWssoUsersList( Plugin plugin )
     {
         return _dao.selectWssoUserList( plugin );
     }
@@ -125,7 +124,7 @@ public final class WssoUserHome
      * @param plugin The current plugin using this method
      * @return A collection of wssoUsers
      */
-    public static Collection findWssoUsersListForRole( int nIdRole, Plugin plugin )
+    public static Collection<WssoUser> findWssoUsersListForRole( int nIdRole, Plugin plugin )
     {
         return _dao.selectWssoUsersListForRole( nIdRole, plugin );
     }
@@ -136,7 +135,7 @@ public final class WssoUserHome
      * @param plugin The current plugin using this method
      * @return A collection of wssoUsers
      */
-    public static Collection findWssoUsersListForGuid( String strGuid, Plugin plugin )
+    public static Collection<WssoUser> findWssoUsersListForGuid( String strGuid, Plugin plugin )
     {
         return _dao.selectWssoUserListForGuid( strGuid, plugin );
     }

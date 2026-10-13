@@ -36,114 +36,90 @@ package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.bus
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
-
 /**
- * This class provides Data Access methods for WssoRole objects
+ * This class provides Data Access methods for the roles of the WSSO users
  */
-public final class WssoUserRoleDAO implements IWssoUserRoleDAO
+@ApplicationScoped
+public class WssoUserRoleDAO implements IWssoUserRoleDAO
 {
-    // Constants
     private static final String SQL_QUERY_SELECTALL_FOR_USER = " SELECT ur.role FROM mylutece_wsso_user_role ur WHERE ur.mylutece_wsso_user_id = ? ORDER BY ur.role ";
     private static final String SQL_QUERY_SELECTALL_FOR_ROLE = " SELECT ur.mylutece_wsso_user_id FROM mylutece_wsso_user_role ur WHERE ur.role = ? ORDER BY ur.mylutece_wsso_user_id ";
     private static final String SQL_QUERY_DELETE_ROLES_FOR_USER = "DELETE FROM mylutece_wsso_user_role WHERE mylutece_wsso_user_id = ?";
     private static final String SQL_QUERY_INSERT_ROLE_FOR_USER = "INSERT INTO mylutece_wsso_user_role ( mylutece_wsso_user_id, role ) VALUES ( ?, ? ) ";
 
-    /** This class implements the Singleton design pattern. */
-    private static WssoUserRoleDAO _dao = new WssoUserRoleDAO(  );
-
     /**
-     * Creates a new WssoRoleDAO object.
+     * {@inheritDoc}
      */
-    private WssoUserRoleDAO(  )
-    {
-    }
-
-    /**
-     * Returns the unique instance of the singleton.
-     *
-     * @return the instance
-     */
-    static WssoUserRoleDAO getInstance(  )
-    {
-        return _dao;
-    }
-
-    /**
-     * Load the list of Roles for a user
-     * @param nIdUser The id of the user
-     * @param plugin The Plugin using this data access service
-     * @return The Collection of the roles key
-     */
+    @Override
     public Collection<String> selectRoleListForUser( int nIdUser, Plugin plugin )
     {
-        Collection<String> listRoles = new ArrayList(  );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_FOR_USER, plugin );
-        daoUtil.setInt( 1, nIdUser );
-        daoUtil.executeQuery(  );
+        Collection<String> listRoles = new ArrayList<>( );
 
-        while ( daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_FOR_USER, plugin ) )
         {
-            listRoles.add( daoUtil.getString( 1 ) );
-        }
+            daoUtil.setInt( 1, nIdUser );
+            daoUtil.executeQuery( );
 
-        daoUtil.free(  );
+            while ( daoUtil.next( ) )
+            {
+                listRoles.add( daoUtil.getString( 1 ) );
+            }
+        }
 
         return listRoles;
     }
 
     /**
-     * Returns a collection of User id
-     * @param strRoleKey The key of the role
-     * @param plugin The current plugin using this method
-     * @return A collection of User id
+     * {@inheritDoc}
      */
+    @Override
     public Collection<Integer> selectUserListForRole( String strRoleKey, Plugin plugin )
     {
-        Collection<Integer> listUserId = new ArrayList<Integer>(  );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_FOR_ROLE, plugin );
-        daoUtil.setString( 1, strRoleKey );
-        daoUtil.executeQuery(  );
+        Collection<Integer> listUserId = new ArrayList<>( );
 
-        while ( daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_FOR_ROLE, plugin ) )
         {
-            listUserId.add( daoUtil.getInt( 1 ) );
-        }
+            daoUtil.setString( 1, strRoleKey );
+            daoUtil.executeQuery( );
 
-        daoUtil.free(  );
+            while ( daoUtil.next( ) )
+            {
+                listUserId.add( daoUtil.getInt( 1 ) );
+            }
+        }
 
         return listUserId;
     }
 
     /**
-     * Delete roles for a user
-     * @param nIdUser The id of the user
-     * @param plugin The Plugin using this data access service
+     * {@inheritDoc}
      */
+    @Override
     public void deleteRolesForUser( int nIdUser, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_ROLES_FOR_USER, plugin );
-        daoUtil.setInt( 1, nIdUser );
-
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_ROLES_FOR_USER, plugin ) )
+        {
+            daoUtil.setInt( 1, nIdUser );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
-     * Assign a role to user
-     * @param nIdUser The id of the user
-     * @param strRoleId The role key
-     * @param plugin The Plugin using this data access service
+     * {@inheritDoc}
      */
+    @Override
     public void createRoleForUser( int nIdUser, String strRoleId, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_ROLE_FOR_USER, plugin );
-        daoUtil.setInt( 1, nIdUser );
-        daoUtil.setString( 2, strRoleId );
-
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT_ROLE_FOR_USER, plugin ) )
+        {
+            daoUtil.setInt( 1, nIdUser );
+            daoUtil.setString( 2, strRoleId );
+            daoUtil.executeUpdate( );
+        }
     }
 }

@@ -39,142 +39,112 @@ import fr.paris.lutece.portal.service.security.LuteceAuthentication;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
 /**
  * This class provides Data Access methods for authentication (role retrieval).
- *
  */
+@ApplicationScoped
 public class IdxWSSODatabaseDAO implements IIdxWSSODatabaseDAO
 {
     public static final String SQL_QUERY_FIND_USER_BY_GUID = "SELECT mylutece_wsso_user_id, last_name, first_name, email FROM mylutece_wsso_user WHERE guid like ? ";
     public static final String SQL_QUERY_FIND_ALL_USERS = "SELECT guid, last_name, first_name, email FROM mylutece_wsso_user";
-    public static final String SQL_QUERY_FIND_ROLES_FROM_GUID = "SELECT a.role FROM mylutece_wsso_user_role a, mylutece_wsso_user b" +
-        " WHERE b.mylutece_wsso_user_id = a.mylutece_wsso_user_id AND b.guid like ? ";
+    public static final String SQL_QUERY_FIND_ROLES_FROM_GUID = "SELECT a.role FROM mylutece_wsso_user_role a, mylutece_wsso_user b"
+            + " WHERE b.mylutece_wsso_user_id = a.mylutece_wsso_user_id AND b.guid like ? ";
     private static final String SQL_QUERY_UPDATE_DATE_LAST_LOGIN = " UPDATE mylutece_wsso_user SET date_last_login = ? WHERE guid like ? ";
 
-    /** This class implements the Singleton design pattern. */
-    private static IdxWSSODatabaseDAO _dao = new IdxWSSODatabaseDAO(  );
-
     /**
-     * Returns the unique instance of the singleton.
-     *
-     * @return the instance
+     * {@inheritDoc}
      */
-    static IdxWSSODatabaseDAO getInstance(  )
-    {
-        return _dao;
-    }
-
-    /**
-     * Find users by guid
-     *
-     * @param strGuid the WSSO guid
-     * @param plugin The Plugin using this data access service
-     * @param authenticationService the LuteceAuthentication object
-     * @return IdxWSSODatabaseUser the user corresponding to the guid
-     */
+    @Override
     public IdxWSSODatabaseUser findUserByGuid( String strGuid, Plugin plugin, LuteceAuthentication authenticationService )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_USER_BY_GUID, plugin );
-        daoUtil.setString( 1, strGuid );
-        daoUtil.executeQuery(  );
-
-        if ( !daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_USER_BY_GUID, plugin ) )
         {
-            daoUtil.free(  );
+            daoUtil.setString( 1, strGuid );
+            daoUtil.executeQuery( );
 
-            return null;
+            if ( !daoUtil.next( ) )
+            {
+                return null;
+            }
+
+            IdxWSSODatabaseUser user = new IdxWSSODatabaseUser( strGuid, authenticationService );
+            user.setUserInfo( LuteceUser.NAME_FAMILY, daoUtil.getString( 2 ) );
+            user.setUserInfo( LuteceUser.NAME_GIVEN, daoUtil.getString( 3 ) );
+            user.setUserInfo( LuteceUser.BUSINESS_INFO_ONLINE_EMAIL, daoUtil.getString( 4 ) );
+
+            return user;
         }
-
-        String strLastName = daoUtil.getString( 2 );
-        String strFirstName = daoUtil.getString( 3 );
-        String strEmail = daoUtil.getString( 4 );
-
-        IdxWSSODatabaseUser user = new IdxWSSODatabaseUser( strGuid, authenticationService );
-        user.setUserInfo( LuteceUser.NAME_FAMILY, strLastName );
-        user.setUserInfo( LuteceUser.NAME_GIVEN, strFirstName );
-        user.setUserInfo( LuteceUser.BUSINESS_INFO_ONLINE_EMAIL, strEmail );
-        daoUtil.free(  );
-
-        return user;
     }
 
     /**
-     * Find user's roles by guid
-     *
-     * @param strGuid the WSSO guid
-     * @param plugin The Plugin using this data access service
-     * @param authenticationService the LuteceAuthentication object
-     * @return ArrayList the roles list corresponding to the guid
+     * {@inheritDoc}
      */
+    @Override
     public List<String> findUserRolesFromGuid( String strGuid, Plugin plugin, LuteceAuthentication authenticationService )
     {
-        List<String> arrayRoles = new ArrayList<String>(  );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_ROLES_FROM_GUID, plugin );
-        daoUtil.setString( 1, strGuid );
-        daoUtil.executeQuery(  );
+        List<String> arrayRoles = new ArrayList<>( );
 
-        while ( daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_ROLES_FROM_GUID, plugin ) )
         {
-            arrayRoles.add( daoUtil.getString( 1 ) );
-        }
+            daoUtil.setString( 1, strGuid );
+            daoUtil.executeQuery( );
 
-        daoUtil.free(  );
+            while ( daoUtil.next( ) )
+            {
+                arrayRoles.add( daoUtil.getString( 1 ) );
+            }
+        }
 
         return arrayRoles;
     }
 
     /**
-     *
      * {@inheritDoc}
      */
     @Override
     public void updateDateLastLogin( String strGuid, java.util.Date dateLastLogin, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_DATE_LAST_LOGIN, plugin );
-        java.sql.Date dateSql = new java.sql.Date( dateLastLogin.getTime(  ) );
-        daoUtil.setDate( 1, dateSql );
-        daoUtil.setString( 2, strGuid );
-        daoUtil.executeUpdate(  );
-        daoUtil.free(  );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_DATE_LAST_LOGIN, plugin ) )
+        {
+            daoUtil.setDate( 1, new java.sql.Date( dateLastLogin.getTime( ) ) );
+            daoUtil.setString( 2, strGuid );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
-     * Find users list
-     *
-     * @param plugin The Plugin using this data access service
-     * @param authenticationService the LuteceAuthentication object
-     * @return A Collection of users
+     * {@inheritDoc}
      */
+    @Override
     public Collection<IdxWSSODatabaseUser> findUsersList( Plugin plugin, LuteceAuthentication authenticationService )
     {
-        Collection<IdxWSSODatabaseUser> usersList = new ArrayList<IdxWSSODatabaseUser>(  );
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_ALL_USERS, plugin );
-        daoUtil.executeQuery(  );
+        Collection<IdxWSSODatabaseUser> usersList = new ArrayList<>( );
 
-        while ( daoUtil.next(  ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_FIND_ALL_USERS, plugin ) )
         {
-            String strGuid = daoUtil.getString( 1 );
-            String strLastName = daoUtil.getString( 2 );
-            String strFirstName = daoUtil.getString( 3 );
-            String strEmail = daoUtil.getString( 4 );
+            daoUtil.executeQuery( );
 
-            IdxWSSODatabaseUser user = new IdxWSSODatabaseUser( strGuid, authenticationService );
-
-            user.setUserInfo( LuteceUser.NAME_FAMILY, strLastName );
-            user.setUserInfo( LuteceUser.NAME_GIVEN, strFirstName );
-            user.setUserInfo( LuteceUser.BUSINESS_INFO_ONLINE_EMAIL, strEmail );
-
-            user.setRoles( findUserRolesFromGuid( strGuid, plugin, authenticationService ) );
-
-            usersList.add( user );
+            while ( daoUtil.next( ) )
+            {
+                String strGuid = daoUtil.getString( 1 );
+                IdxWSSODatabaseUser user = new IdxWSSODatabaseUser( strGuid, authenticationService );
+                user.setUserInfo( LuteceUser.NAME_FAMILY, daoUtil.getString( 2 ) );
+                user.setUserInfo( LuteceUser.NAME_GIVEN, daoUtil.getString( 3 ) );
+                user.setUserInfo( LuteceUser.BUSINESS_INFO_ONLINE_EMAIL, daoUtil.getString( 4 ) );
+                usersList.add( user );
+            }
         }
 
-        daoUtil.free(  );
+        for ( IdxWSSODatabaseUser user : usersList )
+        {
+            user.setRoles( findUserRolesFromGuid( user.getName( ), plugin, authenticationService ) );
+        }
 
         return usersList;
     }

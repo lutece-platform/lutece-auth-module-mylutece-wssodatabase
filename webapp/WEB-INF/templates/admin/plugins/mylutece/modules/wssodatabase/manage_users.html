@@ -1,46 +1,40 @@
-<div class="row-fluid">
-    <div class="span12">
-        <fieldset>
-            <legend class="clearfix">#i18n{portal.users.manage_users.titleUserList}
-                <span class="pull-right">
-                    <form method="post"  action="jsp/admin/plugins/mylutece/modules/wssodatabase/CreateUser.jsp" class="form-inline spaced">
-                        <button type="submit" class="btn btn-primary btn-small"><i class="icon-plus icon-white"></i><span class="hidden-phone">&nbsp;#i18n{portal.users.manage_users.buttonLabelAddUser}</span></button>
-                    </form>
-                </span>
-            </legend>
-            <div class="row-fluid">
-                <div class="span12">
-                    <table class="table table-striped table-condensed">     
-                        <tr>
-                            <th width="20%">#i18n{module.mylutece.wssodatabase.manage_users.colLastName}</th>
-                            <th width="20%">#i18n{module.mylutece.wssodatabase.manage_users.colFirstName}</th>
-                            <th width="20%">#i18n{module.mylutece.wssodatabase.manage_users.colEmail}</th>
-                            <th width="15%">#i18n{module.mylutece.wssodatabase.manage_users.colDateLogin}</th>
-                            <th width="25%">#i18n{module.mylutece.wssodatabase.manage_users.actions}</th>
-                        </tr>
-                        <#list user_list as user >
-                            <tr>
-                                <td width="20%">${user.lastName}</td>
-                                <td width="20%">&nbsp;${user.firstName}</td>
-                                <td width="20%">&nbsp;${user.email}</td>
-                                <td width="15%">&nbsp;<#if user.dateLastLogin??>${user.dateLastLogin!}<#else>#i18n{module.mylutece.wssodatabase.manage_users.noDateLogin}</#if></td>
-                                <td valign="middle" align="center" width="25%">
-                                    <form action="jsp/admin/plugins/mylutece/modules/wssodatabase/ManageRolesUser.jsp">
-                                        <input type="hidden" name="plugin_name" value="${plugin_name}" />
-                                        <input type="hidden" name="mylutece_wsso_user_id" value="${user.myluteceWssoUserId}" />
-                                        <button type="submit" class="btn btn-primary btn-small" title="#i18n{module.mylutece.wssodatabase.manage_users.linkManageRoles}">
-                                            <i class="icon-list-alt icon-white"></i><span class="hidden-phone">&nbsp;#i18n{module.mylutece.wssodatabase.manage_users.linkManageRoles}</span>
-                                        </button>
-                                        <a class="btn btn-danger btn-small" href="jsp/admin/plugins/mylutece/modules/wssodatabase/RemoveUser.jsp?plugin_name=${plugin_name}&mylutece_wsso_user_id=${user.myluteceWssoUserId}" title="#i18n{portal.users.actions.labelDelete}">
-                                            <i class="icon-trash icon-white"></i>
-                                        </a>
-                                    </form>
-                                </td>
-                            </tr>
-                        </#list>
-                    </table>
-                </div>
-            </div>
-        </fieldset>
-    </div>
-</div>
+<@pageContainer>
+    <@pageColumn>
+        <@pageHeader title='#i18n{portal.users.manage_users.titleUserList}'>
+            <@aButton href='jsp/admin/plugins/mylutece/modules/wssodatabase/ManageUsers.jsp?view=createUser' buttonIcon='plus' title='#i18n{portal.users.manage_users.buttonLabelAddUser}' color='primary' />
+        </@pageHeader>
+        <@messages infos=infos![] errors=errors![] warnings=warnings![] />
+        <#if user_list?has_content>
+            <@manageFeature>
+                <#list user_list as user>
+                <@manageFeatureItem>
+                    <@manageFeatureItemColumn flex=false valign='top'>
+                        <@p class='fw-bold fs-3'>#i18n{module.mylutece.wssodatabase.manage_users.colLastName}</@p>
+                        <@p>${user.lastName!}</@p>
+                    </@manageFeatureItemColumn>
+                    <@manageFeatureItemColumn flex=false valign='top'>
+                        <@p class='fw-bold fs-3'>#i18n{module.mylutece.wssodatabase.manage_users.colFirstName}</@p>
+                        <@p>${user.firstName!}</@p>
+                    </@manageFeatureItemColumn>
+                    <@manageFeatureItemColumn flex=false valign='top'>
+                        <@p class='fw-bold fs-3'>#i18n{module.mylutece.wssodatabase.manage_users.colEmail}</@p>
+                        <@p>${user.email!}</@p>
+                    </@manageFeatureItemColumn>
+                    <@manageFeatureItemColumn flex=false valign='top'>
+                        <@p class='fw-bold fs-3'>#i18n{module.mylutece.wssodatabase.manage_users.colDateLogin}</@p>
+                        <@p><#if user.dateLastLogin??>${user.dateLastLogin?date}<#else>#i18n{module.mylutece.wssodatabase.manage_users.noDateLogin}</#if></@p>
+                    </@manageFeatureItemColumn>
+                    <@manageFeatureItemColumn auto=true align='end'>
+                        <@aButton href='jsp/admin/plugins/mylutece/modules/wssodatabase/ManageUsers.jsp?view=manageRolesUser&amp;mylutece_wsso_user_id=${user.myluteceWssoUserId}' buttonIcon='id-badge' title='#i18n{module.mylutece.wssodatabase.manage_users.linkManageRoles}' hideTitle=['xs','sm','md'] />
+                        <@aButton href='jsp/admin/plugins/mylutece/modules/wssodatabase/ManageUsers.jsp?view=confirmRemoveUser&amp;mylutece_wsso_user_id=${user.myluteceWssoUserId}' buttonIcon='trash' color='danger' title='#i18n{portal.users.actions.labelDelete}' hideTitle=['all'] />
+                    </@manageFeatureItemColumn>
+                </@manageFeatureItem>
+                </#list>
+            </@manageFeature>
+        <#else>
+            <@card>
+                <@empty title='#i18n{portal.util.labelNoItem}' iconName='users-minus' actionTitle='#i18n{portal.users.manage_users.buttonLabelAddUser}' actionUrl='jsp/admin/plugins/mylutece/modules/wssodatabase/ManageUsers.jsp?view=createUser' />
+            </@card>
+        </#if>
+    </@pageColumn>
+</@pageContainer>

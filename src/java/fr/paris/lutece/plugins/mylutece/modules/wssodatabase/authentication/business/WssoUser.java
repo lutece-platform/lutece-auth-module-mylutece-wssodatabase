@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business;
 
-import fr.paris.lutece.portal.service.role.RoleRemovalListenerService;
 
 import java.util.Date;
 
@@ -44,26 +43,12 @@ import java.util.Date;
 public class WssoUser
 {
     // Variables declarations
-    private static WssoUserRoleRemovalListener _listenerRole;
     private int _nMyluteceWssoUserId;
     private String _strGuid;
     private String _strLastName;
     private String _strFirstName;
     private String _strEmail;
     private Date _dateLastLogin;
-
-    /**
-     * Initialize the LdapDatabaseUser
-     */
-    public static void init(  )
-    {
-        // Create removal listeners and register them
-        if ( _listenerRole == null )
-        {
-            _listenerRole = new WssoUserRoleRemovalListener(  );
-            RoleRemovalListenerService.getService(  ).registerListener( _listenerRole );
-        }
-    }
 
     /**
      * Returns the MyluteceWssoUserId

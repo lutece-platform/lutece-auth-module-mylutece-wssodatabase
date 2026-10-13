@@ -33,60 +33,66 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.web;
 
+import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business.WssoUser;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business.WssoUserHome;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.business.WssoUserRoleHome;
+import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.service.WssoDatabasePlugin;
 import fr.paris.lutece.plugins.mylutece.modules.wssodatabase.authentication.util.LdapBrowser;
 import fr.paris.lutece.plugins.mylutece.service.RoleResourceIdService;
 import fr.paris.lutece.portal.business.role.Role;
 import fr.paris.lutece.portal.business.role.RoleHome;
-import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
-import fr.paris.lutece.portal.service.template.AppTemplateService;
-import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
-import fr.paris.lutece.util.html.HtmlTemplate;
+import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
+import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
 import fr.paris.lutece.util.url.UrlItem;
 
-import java.util.ArrayList;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
 import java.util.Collection;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-
 
 /**
- * This class provides the user interface to manage roles features ( manage, create, modify, remove )
+ * Back office management of the WSSO users: import from the directory, roles, removal.
  */
-public class WssodatabaseJspBean extends PluginAdminPageJspBean
+@RequestScoped
+@Named( "myluteceWssodatabaseJspBean" )
+@Controller( controllerJsp = "ManageUsers.jsp", controllerPath = "jsp/admin/plugins/mylutece/modules/wssodatabase/", right = WssodatabaseJspBean.RIGHT_MANAGE_WSSO_USERS, securityTokenEnabled = true )
+public class WssodatabaseJspBean extends MVCAdminJspBean
 {
-    /////////////////////////////////////////////////////////////////////////////////////////
-    // Constants
-
-    // Right
     public static final String RIGHT_MANAGE_WSSO_USERS = "WSSODATABASE_MANAGEMENT_USERS";
 
-    //JSP
-    private static final String MANAGE_USERS = "ManageUsers.jsp";
-    private static final String JSP_DO_REMOVE_USER = "jsp/admin/plugins/mylutece/modules/wssodatabase/DoRemoveUser.jsp";
+    private static final long serialVersionUID = 1L;
 
-    //Propety
+    private static final String VIEW_MANAGE_USERS = "manageUsers";
+    private static final String VIEW_CREATE_USER = "createUser";
+    private static final String VIEW_CONFIRM_REMOVE_USER = "confirmRemoveUser";
+    private static final String VIEW_MANAGE_ROLES_USER = "manageRolesUser";
+    private static final String ACTION_CREATE_USER = "createUser";
+    private static final String ACTION_REMOVE_USER = "removeUser";
+    private static final String ACTION_ASSIGN_ROLE_USER = "assignRoleUser";
+
     private static final String PROPERTY_PAGE_TITLE_MANAGE_USERS = "module.mylutece.wssodatabase.manage_users.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_MANAGE_ROLES_USER = "module.mylutece.wssodatabase.manage_roles_user.pageTitle";
     private static final String PROPERTY_PAGE_TITLE_CREATE_USER = "module.mylutece.wssodatabase.create_user.pageTitle";
 
-    //Messages
     private static final String MESSAGE_CONFIRM_REMOVE_USER = "module.mylutece.wssodatabase.message.confirmRemoveUser";
     private static final String MESSAGE_USER_EXIST = "module.mylutece.wssodatabase.message.user_exist";
     private static final String MESSAGE_ERROR_CREATE_USER = "module.mylutece.wssodatabase.message.create.user";
     private static final String MESSAGE_ERROR_REMOVE_USER = "module.mylutece.wssodatabase.message.remove.user";
+    private static final String MESSAGE_ERROR_USER_NOT_FOUND = "module.mylutece.wssodatabase.message.user_not_found";
 
-    // Parameters
-    private static final String PARAMETER_PLUGIN_NAME = "plugin_name";
     private static final String PARAMETER_MYLUTECE_WSSO_ROLE_ID = "mylutece_wsso_role_id";
     private static final String PARAMETER_MYLUTECE_WSSO_USER_ID = "mylutece_wsso_user_id";
     private static final String PARAMETER_GUID = "guid";
@@ -94,295 +100,230 @@ public class WssodatabaseJspBean extends PluginAdminPageJspBean
     private static final String PARAMETER_FIRST_NAME = "first_name";
     private static final String PARAMETER_EMAIL = "email";
 
-    // Marks FreeMarker
     private static final String MARK_ROLES_LIST = "role_list";
     private static final String MARK_ROLES_LIST_FOR_USER = "user_role_list";
     private static final String MARK_USERS_LIST = "user_list";
     private static final String MARK_USER = "user";
-    private static final String MARK_PLUGIN_NAME = "plugin_name";
     private static final String MARK_LAST_NAME = "last_name";
     private static final String MARK_FIRST_NAME = "first_name";
     private static final String MARK_EMAIL = "email";
+    private static final String MARK_IS_SEARCH = "is_search";
 
-    // Templates
     private static final String TEMPLATE_CREATE_USER = "admin/plugins/mylutece/modules/wssodatabase/create_user.html";
     private static final String TEMPLATE_MANAGE_USERS = "admin/plugins/mylutece/modules/wssodatabase/manage_users.html";
     private static final String TEMPLATE_MANAGE_ROLES_USER = "admin/plugins/mylutece/modules/wssodatabase/manage_roles_user.html";
+
     private static final String CONSTANT_WILDCARD = "*";
-    private static Plugin _plugin;
 
     /**
-     * Creates a new WssodatabaseJspBean object.
+     * {@inheritDoc}
      */
-    public WssodatabaseJspBean(  )
+    @Override
+    public Plugin getPlugin( )
     {
+        return PluginService.getPlugin( WssoDatabasePlugin.PLUGIN_NAME );
     }
 
     /**
-     * Returns the User creation form
+     * Returns the list of the WSSO users.
      *
-     * @param request The Http request
-     * @return Html creation form
+     * @param model
+     *            the model
+     * @return the page
      */
-    public String getCreateUser( HttpServletRequest request )
+    @View( value = VIEW_MANAGE_USERS, defaultView = true )
+    public String getManageUsers( Models model )
     {
-        LdapBrowser ldap = new LdapBrowser(  );
-        Collection userList = null;
+        model.put( MARK_USERS_LIST, WssoUserHome.findWssoUsersList( getPlugin( ) ) );
 
-        if ( _plugin == null )
+        return getPage( PROPERTY_PAGE_TITLE_MANAGE_USERS, TEMPLATE_MANAGE_USERS );
+    }
+
+    /**
+     * Returns the directory search form and the users it found.
+     *
+     * @param request
+     *            the request
+     * @param model
+     *            the model
+     * @return the page
+     */
+    @View( value = VIEW_CREATE_USER, securityTokenAction = ACTION_CREATE_USER )
+    public String getCreateUser( HttpServletRequest request, Models model )
+    {
+        String strUserLastName = StringUtils.defaultString( request.getParameter( PARAMETER_LAST_NAME ) );
+        String strUserFirstName = StringUtils.defaultString( request.getParameter( PARAMETER_FIRST_NAME ) );
+        String strUserEMail = StringUtils.defaultString( request.getParameter( PARAMETER_EMAIL ) );
+        boolean bSearch = !( strUserLastName.isEmpty( ) && strUserFirstName.isEmpty( ) && strUserEMail.isEmpty( ) );
+        Collection<WssoUser> userList = null;
+
+        if ( bSearch )
         {
-            String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
-            _plugin = PluginService.getPlugin( strPluginName );
+            userList = new LdapBrowser( ).getUserList( strUserLastName + CONSTANT_WILDCARD, strUserFirstName + CONSTANT_WILDCARD,
+                    strUserEMail + CONSTANT_WILDCARD );
         }
 
-        setPageTitleProperty( PROPERTY_PAGE_TITLE_CREATE_USER );
-
-        // get the filter parameters
-        String strUserLastName = request.getParameter( PARAMETER_LAST_NAME );
-
-        if ( strUserLastName == null )
-        {
-            strUserLastName = "";
-        }
-
-        String strUserFirstName = request.getParameter( PARAMETER_FIRST_NAME );
-
-        if ( strUserFirstName == null )
-        {
-            strUserFirstName = "";
-        }
-
-        String strUserEMail = request.getParameter( PARAMETER_EMAIL );
-
-        if ( strUserEMail == null )
-        {
-            strUserEMail = "";
-        }
-
-        //search in LDAP
-        if ( !( ( strUserLastName.equals( "" ) ) && ( strUserFirstName.equals( "" ) ) && ( strUserEMail.equals( "" ) ) ) )
-        {
-            try
-            {
-                userList = ldap.getUserList( strUserLastName + CONSTANT_WILDCARD, strUserFirstName + CONSTANT_WILDCARD,
-                        strUserEMail + CONSTANT_WILDCARD );
-            }
-            catch ( Exception e )
-            {
-                AppLogService.error( e.getMessage(  ), e );
-            }
-        }
-
-        HashMap model = new HashMap(  );
         model.put( MARK_USERS_LIST, userList );
-        model.put( MARK_PLUGIN_NAME, _plugin.getName(  ) );
+        model.put( MARK_IS_SEARCH, bSearch );
         model.put( MARK_LAST_NAME, strUserLastName );
         model.put( MARK_FIRST_NAME, strUserFirstName );
         model.put( MARK_EMAIL, strUserEMail );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_CREATE_USER, getLocale(  ), model );
-
-        return getAdminPage( template.getHtml(  ) );
+        return getPage( PROPERTY_PAGE_TITLE_CREATE_USER, TEMPLATE_CREATE_USER );
     }
 
     /**
-     * Process user's creation
+     * Imports a user of the directory.
      *
-     * @param request The Http request
-     * @return The user's Displaying Url
+     * @param request
+     *            the request
+     * @return the redirection
      */
+    @Action( ACTION_CREATE_USER )
     public String doCreateUser( HttpServletRequest request )
     {
-        Collection userList = null;
-        WssoUser user = null;
-        LdapBrowser ldap = new LdapBrowser(  );
-
-        if ( _plugin == null )
-        {
-            String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
-            _plugin = PluginService.getPlugin( strPluginName );
-        }
-
         String strUserGuid = request.getParameter( PARAMETER_GUID );
 
-        if ( strUserGuid == null )
+        if ( StringUtils.isBlank( strUserGuid ) )
         {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_CREATE_USER, AdminMessage.TYPE_ERROR );
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_CREATE_USER, AdminMessage.TYPE_ERROR ) );
         }
 
-        userList = WssoUserHome.findWssoUsersListForGuid( strUserGuid, _plugin );
-
-        if ( userList.size(  ) == 0 )
+        if ( !WssoUserHome.findWssoUsersListForGuid( strUserGuid, getPlugin( ) ).isEmpty( ) )
         {
-            user = ldap.getUserPublicData( strUserGuid );
-
-            if ( user == null )
-            {
-                return AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_CREATE_USER, AdminMessage.TYPE_ERROR );
-            }
-
-            WssoUserHome.create( user, _plugin );
-        }
-        else
-        {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_USER_EXIST, AdminMessage.TYPE_STOP );
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_USER_EXIST, AdminMessage.TYPE_STOP ) );
         }
 
-        return MANAGE_USERS + "?" + PARAMETER_PLUGIN_NAME + "=" + _plugin.getName(  );
-    }
-
-    /**
-     * Returns removal user's form
-     *
-     * @param request The Http request
-     * @return Html form
-     */
-    public String getRemoveUser( HttpServletRequest request )
-    {
-        if ( _plugin == null )
-        {
-            String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
-            _plugin = PluginService.getPlugin( strPluginName );
-        }
-
-        int nUserId = Integer.parseInt( request.getParameter( PARAMETER_MYLUTECE_WSSO_USER_ID ) );
-
-        UrlItem url = new UrlItem( JSP_DO_REMOVE_USER );
-        url.addParameter( PARAMETER_PLUGIN_NAME, _plugin.getName(  ) );
-        url.addParameter( PARAMETER_MYLUTECE_WSSO_USER_ID, nUserId );
-
-        return AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_USER, url.getUrl(  ),
-            AdminMessage.TYPE_CONFIRMATION );
-    }
-
-    /**
-     * Process user's removal
-     *
-     * @param request The Http request
-     * @return The Jsp management URL of the process result
-     */
-    public String doRemoveUser( HttpServletRequest request )
-    {
-        if ( _plugin == null )
-        {
-            String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
-            _plugin = PluginService.getPlugin( strPluginName );
-        }
-
-        if ( request.getParameter( PARAMETER_MYLUTECE_WSSO_USER_ID ) == null )
-        {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_REMOVE_USER, AdminMessage.TYPE_ERROR );
-        }
-
-        int nUserId = Integer.parseInt( request.getParameter( PARAMETER_MYLUTECE_WSSO_USER_ID ) );
-
-        WssoUser user = WssoUserHome.findByPrimaryKey( nUserId, _plugin );
+        WssoUser user = new LdapBrowser( ).getUserPublicData( strUserGuid );
 
         if ( user == null )
         {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_REMOVE_USER, AdminMessage.TYPE_ERROR );
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_CREATE_USER, AdminMessage.TYPE_ERROR ) );
         }
 
-        WssoUserHome.remove( user, _plugin );
-        WssoUserRoleHome.deleteRolesForUser( user.getMyluteceWssoUserId(  ), _plugin );
+        WssoUserHome.create( user, getPlugin( ) );
 
-        return MANAGE_USERS + "?" + PARAMETER_PLUGIN_NAME + "=" + _plugin.getName(  );
+        return redirectView( request, VIEW_MANAGE_USERS );
     }
 
     /**
-     * Returns users management form
+     * Asks the confirmation of a user removal.
      *
-     * @param request The Http request
-     * @return Html form
+     * @param request
+     *            the request
+     * @return the redirection to the confirmation message
      */
-    public String getManageUsers( HttpServletRequest request )
+    @View( value = VIEW_CONFIRM_REMOVE_USER, securityTokenAction = ACTION_REMOVE_USER )
+    public String getConfirmRemoveUser( HttpServletRequest request )
     {
-        if ( _plugin == null )
+        WssoUser user = findUser( request );
+
+        if ( user == null )
         {
-            String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
-            _plugin = PluginService.getPlugin( strPluginName );
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_USER_NOT_FOUND, AdminMessage.TYPE_STOP ) );
         }
 
-        setPageTitleProperty( PROPERTY_PAGE_TITLE_MANAGE_USERS );
+        UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_USER ) );
+        url.addParameter( PARAMETER_MYLUTECE_WSSO_USER_ID, user.getMyluteceWssoUserId( ) );
 
-        Collection userList = WssoUserHome.findWssoUsersList( _plugin );
-        HashMap model = new HashMap(  );
-        model.put( MARK_USERS_LIST, userList );
-        model.put( MARK_PLUGIN_NAME, _plugin.getName(  ) );
-
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_USERS, getLocale(  ), model );
-
-        return getAdminPage( template.getHtml(  ) );
+        return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_USER, url.getUrl( ), AdminMessage.TYPE_CONFIRMATION ) );
     }
 
     /**
-     * Returns roles management form for a specified user
+     * Removes a user and its roles.
      *
-     * @param request The Http request
-     * @return Html form
+     * @param request
+     *            the request
+     * @return the redirection
      */
-    public String getManageRolesUser( HttpServletRequest request )
+    @Action( ACTION_REMOVE_USER )
+    public String doRemoveUser( HttpServletRequest request )
     {
-        AdminUser adminUser = getUser(  );
+        WssoUser user = findUser( request );
 
-        if ( _plugin == null )
+        if ( user == null )
         {
-            String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
-            _plugin = PluginService.getPlugin( strPluginName );
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_REMOVE_USER, AdminMessage.TYPE_ERROR ) );
         }
 
-        setPageTitleProperty( PROPERTY_PAGE_TITLE_MANAGE_ROLES_USER );
+        WssoUserHome.remove( user, getPlugin( ) );
+        WssoUserRoleHome.deleteRolesForUser( user.getMyluteceWssoUserId( ), getPlugin( ) );
 
-        int nUserId = Integer.parseInt( request.getParameter( PARAMETER_MYLUTECE_WSSO_USER_ID ) );
+        return redirectView( request, VIEW_MANAGE_USERS );
+    }
 
-        WssoUser user = WssoUserHome.findByPrimaryKey( nUserId, _plugin );
+    /**
+     * Returns the roles of a user.
+     *
+     * @param request
+     *            the request
+     * @param model
+     *            the model
+     * @return the page
+     */
+    @View( value = VIEW_MANAGE_ROLES_USER, securityTokenAction = ACTION_ASSIGN_ROLE_USER )
+    public String getManageRolesUser( HttpServletRequest request, Models model )
+    {
+        WssoUser user = findUser( request );
 
-        Collection<Role> allRoleList = RoleHome.findAll(  );
-        allRoleList = (ArrayList<Role>) RBACService.getAuthorizedCollection( allRoleList,
-                RoleResourceIdService.PERMISSION_ASSIGN_ROLE, adminUser );
+        if ( user == null )
+        {
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_USER_NOT_FOUND, AdminMessage.TYPE_STOP ) );
+        }
 
-        Collection<String> userRoleList = WssoUserRoleHome.findRolesListForUser( nUserId, _plugin );
+        Collection<Role> allRoleList = RBACService.getAuthorizedCollection( RoleHome.findAll( ), RoleResourceIdService.PERMISSION_ASSIGN_ROLE,
+                (User) getUser( ) );
 
-        HashMap model = new HashMap(  );
         model.put( MARK_ROLES_LIST, allRoleList );
-        model.put( MARK_ROLES_LIST_FOR_USER, userRoleList );
+        model.put( MARK_ROLES_LIST_FOR_USER, WssoUserRoleHome.findRolesListForUser( user.getMyluteceWssoUserId( ), getPlugin( ) ) );
         model.put( MARK_USER, user );
-        model.put( MARK_PLUGIN_NAME, _plugin.getName(  ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_ROLES_USER, getLocale(  ), model );
-
-        return getAdminPage( template.getHtml(  ) );
+        return getPage( PROPERTY_PAGE_TITLE_MANAGE_ROLES_USER, TEMPLATE_MANAGE_ROLES_USER );
     }
 
     /**
-     * Process assignation roles for a specified user
+     * Replaces the roles of a user by the checked ones.
      *
-     * @param request The Http request
-     * @return Html form
+     * @param request
+     *            the request
+     * @return the redirection
      */
+    @Action( ACTION_ASSIGN_ROLE_USER )
     public String doAssignRoleUser( HttpServletRequest request )
     {
-        if ( _plugin == null )
+        WssoUser user = findUser( request );
+
+        if ( user == null )
         {
-            String strPluginName = request.getParameter( PARAMETER_PLUGIN_NAME );
-            _plugin = PluginService.getPlugin( strPluginName );
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_ERROR_USER_NOT_FOUND, AdminMessage.TYPE_STOP ) );
         }
 
-        int nUserId = Integer.parseInt( request.getParameter( PARAMETER_MYLUTECE_WSSO_USER_ID ) );
-        WssoUser user = WssoUserHome.findByPrimaryKey( nUserId, _plugin );
+        WssoUserRoleHome.deleteRolesForUser( user.getMyluteceWssoUserId( ), getPlugin( ) );
 
-        String[] roleArray = request.getParameterValues( PARAMETER_MYLUTECE_WSSO_ROLE_ID );
-
-        WssoUserRoleHome.deleteRolesForUser( user.getMyluteceWssoUserId(  ), _plugin );
+        String [ ] roleArray = request.getParameterValues( PARAMETER_MYLUTECE_WSSO_ROLE_ID );
 
         if ( roleArray != null )
         {
-            for ( int i = 0; i < roleArray.length; i++ )
+            for ( String strRole : roleArray )
             {
-                WssoUserRoleHome.createRoleForUser( nUserId, roleArray[i], _plugin );
+                WssoUserRoleHome.createRoleForUser( user.getMyluteceWssoUserId( ), strRole, getPlugin( ) );
             }
         }
 
-        return MANAGE_USERS + "?" + PARAMETER_PLUGIN_NAME + "=" + _plugin.getName(  );
+        return redirectView( request, VIEW_MANAGE_USERS );
+    }
+
+    /**
+     * Loads the user named by the request.
+     *
+     * @param request
+     *            the request
+     * @return the user, or null if the id is missing or unknown
+     */
+    private WssoUser findUser( HttpServletRequest request )
+    {
+        int nUserId = NumberUtils.toInt( request.getParameter( PARAMETER_MYLUTECE_WSSO_USER_ID ), -1 );
+
+        return ( nUserId < 0 ) ? null : WssoUserHome.findByPrimaryKey( nUserId, getPlugin( ) );
     }
 }
